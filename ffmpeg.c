@@ -3040,13 +3040,13 @@ static int transcode_init(void)
     }
 
     /* dump the stream mapping */
-    av_log(NULL, AV_LOG_INFO, "Stream mapping:\n");
+    av_log(NULL, AV_LOG_INFO, "fef Stream mapping:\n");
     for (i = 0; i < nb_input_streams; i++) {
         ist = input_streams[i];
 
         for (j = 0; j < ist->nb_filters; j++) {
             if (ist->filters[j]->graph->graph_desc) {
-                av_log(NULL, AV_LOG_INFO, "  Stream #%d:%d (%s) -> %s",
+                av_log(NULL, AV_LOG_INFO, "wahaha  Stream #%d:%d (%s) -> %s",
                        ist->file_index, ist->st->index, ist->dec ? ist->dec->name : "?",
                        ist->filters[j]->name);
                 if (nb_filtergraphs > 1)
@@ -3072,7 +3072,7 @@ static int transcode_init(void)
             if (nb_filtergraphs > 1)
                 av_log(NULL, AV_LOG_INFO, " (graph %d)", ost->filter->graph->index);
 
-            av_log(NULL, AV_LOG_INFO, " -> Stream #%d:%d (%s)\n", ost->file_index,
+            av_log(NULL, AV_LOG_INFO, "wa -> Stream #%d:%d (%s)\n", ost->file_index,
                    ost->index, ost->enc ? ost->enc->name : "?");
             continue;
         }
