@@ -154,7 +154,7 @@ int        nb_filtergraphs;
 static struct termios oldtty;
 static int restore_tty;
 #endif
-
+int print = 0;
 static void free_input_threads(void);
 
 
@@ -3941,7 +3941,7 @@ int main(int argc, char **argv)
 //         av_log(NULL, AV_LOG_FATAL, "At least one input file must be specified\n");
 //         exit_program(1);
 //     }
-
+    print = 1;
     current_time = ti = getutime();
     if (transcode() < 0)
         exit_program(1);

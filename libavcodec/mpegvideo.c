@@ -47,6 +47,7 @@
 #include "thread.h"
 #include <limits.h>
 
+extern int print;
 static const uint8_t ff_default_chroma_qscale_table[32] = {
 //   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
@@ -2973,6 +2974,17 @@ static inline void put_dct(MpegEncContext *s,
                            int16_t *block, int i, uint8_t *dest, int line_size, int qscale)
 {
     s->dct_unquantize_intra(s, block, i, qscale);
+    if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print)
+    {
+    	for(int i = 0; i < 64; i++)
+    	{
+    		if(i != 0 && i % 8 == 0)
+    			av_log(s->avctx, AV_LOG_DEBUG, ";");
+    		av_log(s->avctx, AV_LOG_DEBUG, "%5d", block[i]);
+
+    	}
+    	av_log(s->avctx, AV_LOG_DEBUG, "\n");
+    }
     s->idsp.idct_put(dest, line_size, block);
 }
 
@@ -3027,7 +3039,18 @@ void ff_clean_intra_table_entries(MpegEncContext *s)
 
     s->mbintra_table[xy]= 0;
 }
-
+void print_dct_block(MpegEncContext *s, uint8_t *dest, int linesize)
+{
+	for(int i = 0; i < 8; i++)
+	{
+		for(int j = 0; j < 8; j++)
+		{
+			av_log(s->avctx, AV_LOG_DEBUG, "%5d", dest[i * linesize + j]);
+		}
+		av_log(s->avctx, AV_LOG_DEBUG, ";");
+	}
+	av_log(s->avctx, AV_LOG_DEBUG, "\n");
+}
 /* generic function called after a macroblock has been parsed by the
    decoder or after it has been encoded by the encoder.
 
@@ -3050,14 +3073,17 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
         return;
     }
 
-    if(s->avctx->debug&FF_DEBUG_DCT_COEFF) {
+    if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print) {
        /* print DCT coefficients */
        int i,j;
        av_log(s->avctx, AV_LOG_DEBUG, "DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
        for(i=0; i<6; i++){
+    	   int k = 0;
            for(j=0; j<64; j++){
                av_log(s->avctx, AV_LOG_DEBUG, "%5d",
                       block[i][s->idsp.idct_permutation[j]]);
+               if(++k % 8 == 0)
+            	   av_log(s->avctx, AV_LOG_DEBUG, ";");
            }
            av_log(s->avctx, AV_LOG_DEBUG, "\n");
        }
@@ -3229,6 +3255,8 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
         } else {
             /* dct only in intra block */
             if(s->encoding || !(s->codec_id==AV_CODEC_ID_MPEG1VIDEO || s->codec_id==AV_CODEC_ID_MPEG2VIDEO)){
+            	if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print)
+            		av_log(s->avctx, AV_LOG_DEBUG, "Dequantized DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
                 put_dct(s, block[0], 0, dest_y                          , dct_linesize, s->qscale);
                 put_dct(s, block[1], 1, dest_y              + block_size, dct_linesize, s->qscale);
                 put_dct(s, block[2], 2, dest_y + dct_offset             , dct_linesize, s->qscale);
@@ -3275,7 +3303,26 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
                     }
                 }//gray
             }
+            if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print)
+            {
+			   // print DCT coefficients
+			   av_log(s->avctx, AV_LOG_DEBUG, "IDCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
+
+			   print_dct_block(s, dest_y,                           dct_linesize);
+			   print_dct_block(s, dest_y +              block_size, dct_linesize);
+			   print_dct_block(s, dest_y + dct_offset,              dct_linesize);
+			   print_dct_block(s, dest_y + dct_offset + block_size, dct_linesize);
+			   if(!CONFIG_GRAY || !(s->flags&CODEC_FLAG_GRAY)){
+			                      if(s->chroma_y_shift){
+			                    	  print_dct_block(s, dest_cb, uvlinesize);
+			                    	  print_dct_block(s, dest_cr, uvlinesize);
+			                      }
+			   }
+            }
         }
+
+
+
 skip_idct:
         if(!readable){
             s->hdsp.put_pixels_tab[0][0](s->dest[0], dest_y ,   linesize,16);
@@ -3284,6 +3331,9 @@ skip_idct:
         }
     }
 }
+
+
+
 
 void ff_mpv_decode_mb(MpegEncContext *s, int16_t block[12][64])
 {
@@ -3335,6 +3385,8 @@ void ff_init_block_index(MpegEncContext *s){ //FIXME maybe rename
         }
     }
 }
+
+
 
 /**
  * Permute an 8x8 block.

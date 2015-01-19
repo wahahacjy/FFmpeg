@@ -501,7 +501,6 @@ extern const AVIOInterruptCB int_cb;
 extern const OptionDef options[];
 extern const HWAccel hwaccels[];
 
-
 void term_init(void);
 void term_exit(void);
 
