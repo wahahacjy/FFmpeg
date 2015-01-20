@@ -48,6 +48,7 @@
 #include <limits.h>
 
 extern int print;
+extern FILE *cjy_out;
 static const uint8_t ff_default_chroma_qscale_table[32] = {
 //   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
      0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
@@ -2973,18 +2974,22 @@ unhandled:
 static inline void put_dct(MpegEncContext *s,
                            int16_t *block, int i, uint8_t *dest, int line_size, int qscale)
 {
-    s->dct_unquantize_intra(s, block, i, qscale);
-    if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print)
-    {
-    	for(int i = 0; i < 64; i++)
-    	{
-    		if(i != 0 && i % 8 == 0)
-    			av_log(s->avctx, AV_LOG_DEBUG, ";");
-    		av_log(s->avctx, AV_LOG_DEBUG, "%5d", block[i]);
+	//changed by cjy
+	if(print)
+	{
+		fprintf(cjy_out, "Block %d\n", i);
+		fprintf(cjy_out, "Quantized DCT coeffs\n");
+		for(int j = 0; j < 64; j++)
+		{
+			if(j != 0 && j % 8 == 0)
+				fprintf(cjy_out, ";");
+			fprintf(cjy_out, "%5d", block[j]);
 
-    	}
-    	av_log(s->avctx, AV_LOG_DEBUG, "\n");
-    }
+		}
+		fprintf(cjy_out, "\n");
+
+	}
+    s->dct_unquantize_intra(s, block, i, qscale);
     s->idsp.idct_put(dest, line_size, block);
 }
 
@@ -2996,14 +3001,54 @@ static inline void add_dct(MpegEncContext *s,
         s->idsp.idct_add(dest, line_size, block);
     }
 }
-
+FILE *in;
 static inline void add_dequant_dct(MpegEncContext *s,
                            int16_t *block, int i, uint8_t *dest, int line_size, int qscale)
 {
+	//changed by cjy
+	if(print)
+	{
+		fprintf(cjy_out, "Block %d\n", i);
+		fprintf(cjy_out, "Quantized DCT coeffs\n");
+		for(int j = 0; j < 64; j++)
+		{
+			if(j != 0 && j % 8 == 0)
+				fprintf(cjy_out, ";");
+			fprintf(cjy_out, "%5d", block[j]);
+
+		}
+		fprintf(cjy_out, "\n");
+
+	}
     if (s->block_last_index[i] >= 0) {
         s->dct_unquantize_inter(s, block, i, qscale);
-
         s->idsp.idct_add(dest, line_size, block);
+    }
+    //changed by cjy
+    else
+    {
+
+    	if(print)
+		{
+    		fprintf(cjy_out, "Dequantized DCT coeffs\n");
+			for(int j = 0; j < 64; j++)
+			{
+				if(j != 0 && j % 8 == 0)
+					fprintf(cjy_out, ";");
+				fprintf(cjy_out, "    0");
+
+			}
+			fprintf(cjy_out, "\n");
+			fprintf(cjy_out, "IDCT coeffs\n");
+			for(int j = 0; j < 64; j++)
+			{
+				if(j != 0 && j % 8 == 0)
+					fprintf(cjy_out, ";");
+				fprintf(cjy_out, "    0");
+
+			}
+			fprintf(cjy_out, "\n");
+		}
     }
 }
 
@@ -3072,21 +3117,25 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
         s->avctx->hwaccel->decode_mb(s);//xvmc uses pblocks
         return;
     }
-
-    if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print) {
+    //changend by cjy
+    if(print) {
        /* print DCT coefficients */
        int i,j;
-       av_log(s->avctx, AV_LOG_DEBUG, "DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
+       fprintf(cjy_out, "Quantized DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
        for(i=0; i<6; i++){
     	   int k = 0;
            for(j=0; j<64; j++){
-               av_log(s->avctx, AV_LOG_DEBUG, "%5d",
+               fprintf(cjy_out, "%5d",
                       block[i][s->idsp.idct_permutation[j]]);
                if(++k % 8 == 0)
-            	   av_log(s->avctx, AV_LOG_DEBUG, ";");
+            	   fprintf(cjy_out, ";");
            }
-           av_log(s->avctx, AV_LOG_DEBUG, "\n");
+           fprintf(cjy_out,  "\n");
        }
+    }
+    if(print)
+    {
+    	fprintf(cjy_out, "MB at %dx%d:\n", s->mb_x, s->mb_y);
     }
 
     s->current_picture.qscale_table[mb_xy] = s->qscale;
@@ -3255,8 +3304,6 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
         } else {
             /* dct only in intra block */
             if(s->encoding || !(s->codec_id==AV_CODEC_ID_MPEG1VIDEO || s->codec_id==AV_CODEC_ID_MPEG2VIDEO)){
-            	if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print)
-            		av_log(s->avctx, AV_LOG_DEBUG, "Dequantized DCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
                 put_dct(s, block[0], 0, dest_y                          , dct_linesize, s->qscale);
                 put_dct(s, block[1], 1, dest_y              + block_size, dct_linesize, s->qscale);
                 put_dct(s, block[2], 2, dest_y + dct_offset             , dct_linesize, s->qscale);
@@ -3303,7 +3350,7 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
                     }
                 }//gray
             }
-            if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print)
+            /*if(s->avctx->debug&FF_DEBUG_DCT_COEFF && print)
             {
 			   // print DCT coefficients
 			   av_log(s->avctx, AV_LOG_DEBUG, "IDCT coeffs of MB at %dx%d:\n", s->mb_x, s->mb_y);
@@ -3318,7 +3365,7 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 			                    	  print_dct_block(s, dest_cr, uvlinesize);
 			                      }
 			   }
-            }
+            }*/
         }
 
 

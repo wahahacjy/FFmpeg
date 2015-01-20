@@ -1,4 +1,5 @@
 1 添加变量print用于控制输出，cjy_out控制输出位置
 2 h263dec.c ff_h263_decode_frame 添加Frame type输出
+3 mpegvideo.c add_dequant_dct 添加预测块的DCT系数的输出
 4 xvididct.c ff_xvid_idct 输出反量化后的DCT系数以及反变换后的DCT系数
 5 mpegvideo.c add_dequant_dct 添加残差为0时系数0的输出

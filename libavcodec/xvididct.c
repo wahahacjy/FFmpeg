@@ -290,8 +290,22 @@ static void idct_col_3(short *const in)
 
 void ff_xvid_idct(int16_t *const in)
 {
+	//changed by cjy
+	extern FILE *cjy_out;
+	extern int print;
     int i, rows = 0x07;
+    if(print)
+	{
+    	fprintf(cjy_out, "Dequantized DCT coeffs\n");
+		for(int j = 0; j < 64; j++)
+		{
+			if(j != 0 && j % 8 == 0)
+				fprintf(cjy_out, ";");
+			fprintf(cjy_out, "%5d", in[j]);
 
+		}
+		fprintf(cjy_out, "\n");
+	}
     idct_row(in + 0 * 8, TAB04, RND0);
     idct_row(in + 1 * 8, TAB17, RND1);
     idct_row(in + 2 * 8, TAB26, RND2);
@@ -316,6 +330,18 @@ void ff_xvid_idct(int16_t *const in)
         for (i = 0; i < 8; i++)
             idct_col_3(in + i);
     }
+    if(print)
+	{
+    	fprintf(cjy_out, "IDCT coeffs\n");
+		for(int j = 0; j < 64; j++)
+		{
+			if(j != 0 && j % 8 == 0)
+				fprintf(cjy_out, ";");
+			fprintf(cjy_out, "%5d", in[j]);
+
+		}
+		fprintf(cjy_out, "\n");
+	}
 }
 
 static void xvid_idct_put(uint8_t *dest, int line_size, int16_t *block)

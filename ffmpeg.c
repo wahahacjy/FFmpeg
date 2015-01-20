@@ -155,6 +155,7 @@ static struct termios oldtty;
 static int restore_tty;
 #endif
 int print = 0;
+FILE *cjy_out;
 static void free_input_threads(void);
 
 
@@ -3893,7 +3894,7 @@ int main(int argc, char **argv)
 {
     int ret;
     int64_t ti;
-
+    cjy_out = stdout;
     register_exit(ffmpeg_cleanup);
 
     setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */

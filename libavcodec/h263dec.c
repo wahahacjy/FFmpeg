@@ -407,6 +407,7 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     int slice_ret = 0;
     AVFrame *pict = data;
     extern int print;
+    extern FILE *cjy_out;
     s->flags  = avctx->flags;
     s->flags2 = avctx->flags2;
 
@@ -622,9 +623,10 @@ retry:
             goto frame_end;
     }
 
+    //changed by cjy
     if(print)
     {
-    	av_log(s->avctx, AV_LOG_DEBUG, "Frame, type: %c\n", av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+    	fprintf(cjy_out, "Frame, type: %c\n", av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
     }
     /* decode each macroblock */
     s->mb_x = 0;
