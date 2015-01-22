@@ -907,6 +907,7 @@ void ff_wmv2_encode_mb(MpegEncContext * s,
 int ff_mpeg_ref_picture(MpegEncContext *s, Picture *dst, Picture *src);
 void ff_mpeg_unref_picture(MpegEncContext *s, Picture *picture);
 void ff_free_picture_tables(Picture *pic);
+//changed by cjy
 void print_dct_block(MpegEncContext *s, uint8_t *dest, int linesize);
-
+void print_mv(void);
 #endif /* AVCODEC_MPEGVIDEO_H */

@@ -3,3 +3,5 @@
 3 mpegvideo.c add_dequant_dct 添加预测块的DCT系数的输出
 4 xvididct.c ff_xvid_idct 输出反量化后的DCT系数以及反变换后的DCT系数
 5 mpegvideo.c add_dequant_dct 添加残差为0时系数0的输出
+6 mpegvideo.c put_dct 输出量化后的DCT系数
+7 mpegvideo.h add function prototype

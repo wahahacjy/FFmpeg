@@ -300,11 +300,11 @@ void ff_xvid_idct(int16_t *const in)
 		for(int j = 0; j < 64; j++)
 		{
 			if(j != 0 && j % 8 == 0)
-				fprintf(cjy_out, ";");
+				fprintf(cjy_out, ";\n");
 			fprintf(cjy_out, "%5d", in[j]);
 
 		}
-		fprintf(cjy_out, "\n");
+		fprintf(cjy_out, ";\n");
 	}
     idct_row(in + 0 * 8, TAB04, RND0);
     idct_row(in + 1 * 8, TAB17, RND1);
@@ -336,11 +336,11 @@ void ff_xvid_idct(int16_t *const in)
 		for(int j = 0; j < 64; j++)
 		{
 			if(j != 0 && j % 8 == 0)
-				fprintf(cjy_out, ";");
+				fprintf(cjy_out, ";\n");
 			fprintf(cjy_out, "%5d", in[j]);
 
 		}
-		fprintf(cjy_out, "\n");
+		fprintf(cjy_out, ";\n\n");
 	}
 }
 

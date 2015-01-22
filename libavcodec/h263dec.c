@@ -626,7 +626,7 @@ retry:
     //changed by cjy
     if(print)
     {
-    	fprintf(cjy_out, "Frame, type: %c\n", av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+    	fprintf(cjy_out, "Frame %-4d, type: %c\n", s->picture_number, av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
     }
     /* decode each macroblock */
     s->mb_x = 0;
