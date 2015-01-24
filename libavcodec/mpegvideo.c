@@ -3064,7 +3064,7 @@ void print_dct_block(MpegEncContext *s, uint8_t *dest, int linesize) {
 	}
 	av_log(s->avctx, AV_LOG_DEBUG, "\n");
 }
-void print_mv() {
+/*void print_mv() {
 	for (direction = 0; direction < 2; direction++) {
 		if (!USES_LIST(mb_type, direction))
 			continue;
@@ -3140,7 +3140,7 @@ void print_mv() {
 			}
 		}
 	}
-}
+}*/
 
 	/* generic function called after a macroblock has been parsed by the
 	 decoder or after it has been encoded by the encoder.
