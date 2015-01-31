@@ -909,5 +909,5 @@ void ff_mpeg_unref_picture(MpegEncContext *s, Picture *picture);
 void ff_free_picture_tables(Picture *pic);
 //changed by cjy
 void print_dct_block(MpegEncContext *s, uint8_t *dest, int linesize);
-void print_mv(void);
+void print_mv(MpegEncContext *, uint32_t);
 #endif /* AVCODEC_MPEGVIDEO_H */
