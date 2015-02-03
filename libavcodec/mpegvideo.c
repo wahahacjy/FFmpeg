@@ -1984,14 +1984,14 @@ static int clip_line(int *sx, int *sy, int *ex, int *ey, int maxx) {
 	if (*sx < 0) {
 		if (*ex < 0)
 		return 1;
-		*sy = *ey + (*sy - *ey) * (int64_t) * ex / (*ex - *sx);
+		*sy = *ey + (*sy - *ey) * (int64_t) *ex / (*ex - *sx);
 		*sx = 0;
 	}
 
 	if (*ex > maxx) {
 		if (*sx > maxx)
 		return 1;
-		*ey = *sy + (*ey - *sy) * (int64_t)(maxx - *sx) / (*ex - *sx);
+		*ey = *sy + (*ey - *sy) * (int64_t) (maxx - *sx) / (*ex - *sx);
 		*ex = maxx;
 	}
 	return 0;
@@ -3061,8 +3061,10 @@ void print_dct_block(MpegEncContext *s, uint8_t *dest, int linesize) {
 	av_log(s->avctx, AV_LOG_DEBUG, "\n");
 }
 void print_mv(MpegEncContext *s, uint32_t mb_type) {
+	if (s->mb_intra)
+		return;
 	if (!USES_LIST(mb_type, 1)) {
-		fprintf(cjy_out, "  MV0 : ");
+		fprintf(cjy_out, "  Forward MV0 : ");
 		if (IS_16X16(mb_type)) {
 			fprintf(cjy_out, "X =%3d,Y =%3d", s->mv[0][0][0], s->mv[0][0][1]);
 		} else if (IS_16X8(mb_type) || IS_8X16(mb_type)) {
@@ -3076,7 +3078,7 @@ void print_mv(MpegEncContext *s, uint32_t mb_type) {
 					s->mv[0][3][0], s->mv[0][3][1]);
 		}
 	} else if (!USES_LIST(mb_type, 0)) {
-		fprintf(cjy_out, "  MV1 : ");
+		fprintf(cjy_out, "  Backward MV1 : ");
 		if (IS_16X16(mb_type)) {
 			fprintf(cjy_out, "X =%3d,Y =%3d", s->mv[1][0][0], s->mv[1][0][1]);
 		} else if (IS_16X8(mb_type) || IS_8X16(mb_type)) {
@@ -3090,7 +3092,7 @@ void print_mv(MpegEncContext *s, uint32_t mb_type) {
 					s->mv[1][3][0], s->mv[1][3][1]);
 		}
 	} else {
-		fprintf(cjy_out, "  MV0 : ");
+		fprintf(cjy_out, "  Bi-direct MV0 : ");
 		if (IS_16X16(mb_type)) {
 			fprintf(cjy_out, "X =%3d,Y =%3d", s->mv[0][0][0], s->mv[0][0][1]);
 		} else if (IS_16X8(mb_type) || IS_8X16(mb_type)) {
@@ -3140,6 +3142,8 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 	}
 	//changend by cjy
 	if (print) {
+		fprintf(cjy_out, "Frame %-4d,type: %c\n", s->picture_number,
+				av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
 		/* print DCT coefficients */
 		int i, j;
 		fprintf(stderr, "Quantized DCT coeffs of MB at %dx%d:\n", s->mb_x,
@@ -3156,7 +3160,7 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 	}
 	if (print) {
 
-		fprintf(cjy_out, "\nMB at %dx%d : QScale = %-3d MB_TYPE = ", s->mb_x,
+		fprintf(cjy_out, "MB at %dx%d : QScale = %-3d MB_TYPE = ", s->mb_x,
 				s->mb_y, s->qscale);
 		mb_type = s->current_picture.mb_type[mb_xy];
 		// Type & MV direction
@@ -3203,7 +3207,8 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 			fprintf(cjy_out, "=");
 		else
 			fprintf(cjy_out, " ");
-
+		if (s->quarter_sample)
+			fprintf(cjy_out, " Quarter sample");
 		print_mv(s, mb_type);
 		fprintf(cjy_out, "\n");
 	}
@@ -3377,9 +3382,9 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 					} else {
 						//chroma422
 						dct_linesize = uvlinesize << s->interlaced_dct;
-						dct_offset = mpv_motion_internal
-						s->interlaced_dct ?
-								uvlinesize : uvlinesize * block_size;
+						dct_offset =
+								s->interlaced_dct ?
+										uvlinesize : uvlinesize * block_size;
 
 						add_dct(s, block[4], 4, dest_cb, dct_linesize);
 						add_dct(s, block[5], 5, dest_cr, dct_linesize);
@@ -3392,7 +3397,6 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 									dct_linesize);
 							add_dct(s, block[9], 9, dest_cr + block_size,
 									dct_linesize);
-							mpv_motion_internal
 							add_dct(s, block[10], 10,
 									dest_cb + block_size + dct_offset,
 									dct_linesize);

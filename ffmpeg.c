@@ -156,6 +156,7 @@ static int restore_tty;
 #endif
 int print = 0;
 FILE *cjy_out;
+char *cjy_folder = NULL;
 static void free_input_threads(void);
 
 
@@ -3894,7 +3895,7 @@ int main(int argc, char **argv)
 {
     int ret;
     int64_t ti;
-    cjy_out = stdout;
+    cjy_out = NULL;
     register_exit(ffmpeg_cleanup);
 
     setvbuf(stderr,NULL,_IONBF,0); /* win32 runtime needs this */
@@ -3908,6 +3909,11 @@ int main(int argc, char **argv)
         argc--;
         argv++;
     }
+	if (argc > 1 && !strcmp(argv[1], "-cjy_folder")) {
+		cjy_folder = argv[2];
+		argc-=2;
+		argv+=2;
+	}
 
     avcodec_register_all();
 #if CONFIG_AVDEVICE

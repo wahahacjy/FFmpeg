@@ -408,6 +408,7 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     AVFrame *pict = data;
     extern int print;
     extern FILE *cjy_out;
+    extern char *cjy_folder;
     s->flags  = avctx->flags;
     s->flags2 = avctx->flags2;
 
@@ -624,9 +625,22 @@ retry:
     }
 
     //changed by cjy
+    //extern char *folder;
     if(print)
     {
-    	fprintf(cjy_out, "Frame %-4d, type: %c\n", s->picture_number, av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+    	if(cjy_out != NULL)
+    		fclose(cjy_out);
+    	char *file = malloc(10 + strlen(cjy_folder));
+    	sprintf(file, "%s/%04d_%1c", cjy_folder, s->picture_number, av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+    	cjy_out = fopen(file, "w");
+    	if(cjy_out == NULL)
+    	{
+    		fprintf(stderr, "File open failed!\n");
+    		exit(1);
+    	}
+    	free(file);
+    	file = NULL;
+    	//fprintf(cjy_out, "Frame %-4d, type: %c\n", s->picture_number, av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
     }
     /* decode each macroblock */
     s->mb_x = 0;
