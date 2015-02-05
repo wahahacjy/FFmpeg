@@ -764,7 +764,7 @@ static int xvid_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     /* Encode */
     xerr = xvid_encore(x->encoder_handle, XVID_ENC_ENCODE,
                        &xvid_enc_frame, &xvid_enc_stats);
-
+    xerr = CjySetFolder(6);
     /* Two-pass log buffer swapping */
     avctx->stats_out = NULL;
     if (x->twopassbuffer) {

@@ -4067,6 +4067,7 @@ int main(int argc, char **argv) {
 	int64_t ti;
 	cjy_out = NULL;
 	//cjy_folder = "";
+	//CjySetFolder();
 	if (argc > 1 && !strcmp(argv[1], "-cjy_folder")) {
 		memcpy(cjy_folder, argv[2], strlen(argv[2]) + 1);
 		//cjy_folder = argv[2];
