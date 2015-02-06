@@ -2984,15 +2984,27 @@ static inline void add_dequant_dct(MpegEncContext *s, int16_t *block, int i,
 		uint8_t *dest, int line_size, int qscale) {
 	//changed by cjy
 	if (print) {
-		fprintf(cjy_out, "Block %d\n", i);
-		fprintf(cjy_out, "Quantized DCT coeffs\n");
-		for (int j = 0; j < 64; j++) {
-			if (j != 0 && j % 8 == 0)
-				fprintf(cjy_out, ";\n");
-			fprintf(cjy_out, "%5d", block[j]);
+		if (s->block_last_index[i] >= 0) {
+			fprintf(cjy_out, "Block %d\n", i);
+			fprintf(cjy_out, "Quantized DCT coeffs\n");
+			for (int j = 0; j < 64; j++) {
+				if (j != 0 && j % 8 == 0)
+					fprintf(cjy_out, ";\n");
+				fprintf(cjy_out, "%5d", block[j]);
 
+			}
+			fprintf(cjy_out, ";\n");
+		} else {//if is s-mb,block will contains the data belongs to previous mb
+			fprintf(cjy_out, "Block %d\n", i);
+			fprintf(cjy_out, "Quantized DCT coeffs\n");
+			for (int j = 0; j < 64; j++) {
+				if (j != 0 && j % 8 == 0)
+					fprintf(cjy_out, ";\n");
+				fprintf(cjy_out, "%5d", 0);
+
+			}
+			fprintf(cjy_out, ";\n");
 		}
-		fprintf(cjy_out, ";\n");
 
 	}
 	if (s->block_last_index[i] >= 0) {

@@ -375,6 +375,13 @@ static av_cold int xvid_encode_init(AVCodecContext *avctx)
     xvid_enc_create_t         xvid_enc_create = { 0 };
     xvid_enc_plugin_t         plugins[4];
 
+    extern char cjy_folder[];
+    extern char *cjy_xvid_folder;
+    if(strlen(cjy_folder) > 0)
+    	cjy_xvid_folder = cjy_folder;
+    else
+    	cjy_xvid_folder = NULL;
+
     x->twopassfd = -1;
 
     /* Bring in VOP flags from ffmpeg command-line */
@@ -764,7 +771,6 @@ static int xvid_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     /* Encode */
     xerr = xvid_encore(x->encoder_handle, XVID_ENC_ENCODE,
                        &xvid_enc_frame, &xvid_enc_stats);
-    xerr = CjySetFolder(6);
     /* Two-pass log buffer swapping */
     avctx->stats_out = NULL;
     if (x->twopassbuffer) {
