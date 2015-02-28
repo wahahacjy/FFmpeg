@@ -151,7 +151,8 @@ static int restore_tty;
 #endif
 int print = 0;
 FILE *cjy_out;
-char cjy_folder[20];
+char cjy_folder[100] = {0};
+char cjy_yuvout[100] = {0};
 static void free_input_threads(void);
 
 /* sub2video hack:
@@ -649,7 +650,7 @@ static void write_frame(AVFormatContext *s, AVPacket *pkt, OutputStream *ost) {
 					"Invalid DTS: %"PRId64" PTS: %"PRId64" in output stream %d:%d, replacing by guess\n",
 					pkt->dts, pkt->pts, ost->file_index, ost->st->index);
 			pkt->pts = pkt->dts = pkt->pts + pkt->dts + ost->last_mux_dts
-					+ 1 - FFMIN3(pkt->pts, pkt->dts, ost->last_mux_dts + 1)
+					+ 1- FFMIN3(pkt->pts, pkt->dts, ost->last_mux_dts + 1)
 					- FFMAX3(pkt->pts, pkt->dts, ost->last_mux_dts + 1);
 		}
 		if ((avctx->codec_type == AVMEDIA_TYPE_AUDIO
@@ -1372,7 +1373,7 @@ static void print_final_stats(int64_t total_size) {
 			total_packets += ist->nb_packets;
 
 			av_log(NULL, AV_LOG_VERBOSE, "  Input stream #%d:%d (%s): ", i, j,
-					media_type_string(type));
+			media_type_string(type));
 			av_log(NULL, AV_LOG_VERBOSE,
 					"%"PRIu64" packets read (%"PRIu64" bytes); ",
 					ist->nb_packets, ist->data_size);
@@ -1409,7 +1410,7 @@ static void print_final_stats(int64_t total_size) {
 			total_packets += ost->packets_written;
 
 			av_log(NULL, AV_LOG_VERBOSE, "  Output stream #%d:%d (%s): ", i, j,
-					media_type_string(type));
+			media_type_string(type));
 			if (ost->encoding_needed) {
 				av_log(NULL, AV_LOG_VERBOSE, "%"PRIu64" frames encoded",
 						ost->frames_encoded);
@@ -1637,7 +1638,7 @@ static void flush_encoders(void) {
 
 		for (;;) {
 			int (*encode)(AVCodecContext*, AVPacket*, const AVFrame*, int*) =
-					NULL;
+			NULL;
 			const char *desc;
 
 			switch (enc->codec_type) {
@@ -2142,7 +2143,7 @@ static int transcode_subtitles(InputStream *ist, AVPacket *pkt, int *got_output)
 		int end = 1;
 		if (ist->prev_sub.got_output) {
 			end = av_rescale(subtitle.pts - ist->prev_sub.subtitle.pts, 1000,
-					AV_TIME_BASE);
+			AV_TIME_BASE);
 			if (end < ist->prev_sub.subtitle.end_display_time) {
 				av_log(ist->dec_ctx, AV_LOG_DEBUG,
 						"Subtitle duration reduced from %d to %d%s\n",
@@ -2198,7 +2199,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt) {
 		ist->pts = 0;
 		if (pkt && pkt->pts != AV_NOPTS_VALUE && !ist->decoding_needed) {
 			ist->dts += av_rescale_q(pkt->pts, ist->st->time_base,
-					AV_TIME_BASE_Q);
+			AV_TIME_BASE_Q);
 			ist->pts = ist->dts; //unused but better to set it to a value thats not totally wrong
 		}
 		ist->saw_first_ts = 1;
@@ -2221,7 +2222,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt) {
 
 	if (pkt->dts != AV_NOPTS_VALUE) {
 		ist->next_dts = ist->dts = av_rescale_q(pkt->dts, ist->st->time_base,
-				AV_TIME_BASE_Q);
+		AV_TIME_BASE_Q);
 		if (ist->dec_ctx->codec_type != AVMEDIA_TYPE_VIDEO
 				|| !ist->decoding_needed)
 			ist->next_pts = ist->pts = ist->dts;
@@ -2237,9 +2238,9 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt) {
 
 		if (avpkt.size && avpkt.size != pkt->size
 				&& !(ist->dec->capabilities & CODEC_CAP_SUBFRAMES)) {
-			av_log(NULL,
-					ist->showed_multi_packet_warning ?
-							AV_LOG_VERBOSE : AV_LOG_WARNING,
+			av_log(NULL, ist->showed_multi_packet_warning ?
+			AV_LOG_VERBOSE :
+															AV_LOG_WARNING,
 					"Multiple frames in a packet from stream %d\n",
 					pkt->stream_index);
 			ist->showed_multi_packet_warning = 1;
@@ -2253,7 +2254,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt) {
 			ret = decode_video(ist, &avpkt, &got_output);
 			if (avpkt.duration) {
 				duration = av_rescale_q(avpkt.duration, ist->st->time_base,
-						AV_TIME_BASE_Q);
+				AV_TIME_BASE_Q);
 			} else if (ist->dec_ctx->framerate.num != 0
 					&& ist->dec_ctx->framerate.den != 0) {
 				int ticks =
@@ -2318,7 +2319,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt) {
 						av_inv_q(ist->framerate), time_base_q);
 			} else if (pkt->duration) {
 				ist->next_dts += av_rescale_q(pkt->duration, ist->st->time_base,
-						AV_TIME_BASE_Q);
+				AV_TIME_BASE_Q);
 			} else if (ist->dec_ctx->framerate.num != 0) {
 				int ticks =
 						av_stream_get_parser(ist->st) ?
@@ -2442,7 +2443,7 @@ static int init_input_stream(int ist_index, char *error, int error_len) {
 		if (ist->dec_ctx->codec_id == AV_CODEC_ID_DVB_SUBTITLE
 				&& (ist->decoding_needed & DECODING_FOR_OST)) {
 			av_dict_set(&ist->decoder_opts, "compute_edt", "1",
-					AV_DICT_DONT_OVERWRITE);
+			AV_DICT_DONT_OVERWRITE);
 			if (ist->decoding_needed & DECODING_FOR_FILTER)
 				av_log(NULL, AV_LOG_WARNING,
 						"Warning using DVB subtitles for filtering and output at the same time is not fully supported, also see -compute_edt [0|1]\n");
@@ -3000,9 +3001,9 @@ static int transcode_init(void) {
 						ost->forced_keyframes_expr_const_values[FKF_N_FORCED] =
 								0;
 						ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_N] =
-								NAN;
+						NAN;
 						ost->forced_keyframes_expr_const_values[FKF_PREV_FORCED_T] =
-								NAN;
+						NAN;
 					} else {
 						parse_forced_key_frames(ost->forced_keyframes, ost,
 								ost->enc_ctx);
@@ -3032,7 +3033,7 @@ static int transcode_init(void) {
 						DEFAULT_PASS_LOGFILENAME_PREFIX, i);
 				if (!strcmp(ost->enc->name, "libx264")) {
 					av_dict_set(&ost->encoder_opts, "stats", logfilename,
-							AV_DICT_DONT_OVERWRITE);
+					AV_DICT_DONT_OVERWRITE);
 				} else {
 					if (enc_ctx->flags & CODEC_FLAG_PASS2) {
 						char *logbuffer;
@@ -3721,7 +3722,7 @@ static int process_input(int file_index) {
 			&& !copy_ts && (is->iformat->flags & AVFMT_TS_DISCONT)
 			&& ifile->last_ts != AV_NOPTS_VALUE) {
 		int64_t pkt_dts = av_rescale_q(pkt.dts, ist->st->time_base,
-				AV_TIME_BASE_Q);
+		AV_TIME_BASE_Q);
 		int64_t delta = pkt_dts - ifile->last_ts;
 		if (delta < -1LL * dts_delta_threshold * AV_TIME_BASE
 				|| delta > 1LL * dts_delta_threshold * AV_TIME_BASE) {
@@ -3741,7 +3742,7 @@ static int process_input(int file_index) {
 			&& pkt.dts != AV_NOPTS_VALUE && ist->next_dts != AV_NOPTS_VALUE
 			&& !copy_ts) {
 		int64_t pkt_dts = av_rescale_q(pkt.dts, ist->st->time_base,
-				AV_TIME_BASE_Q);
+		AV_TIME_BASE_Q);
 		int64_t delta = pkt_dts - ist->next_dts;
 		if (is->iformat->flags & AVFMT_TS_DISCONT) {
 			if (delta < -1LL * dts_delta_threshold * AV_TIME_BASE
@@ -3767,7 +3768,7 @@ static int process_input(int file_index) {
 			}
 			if (pkt.pts != AV_NOPTS_VALUE) {
 				int64_t pkt_pts = av_rescale_q(pkt.pts, ist->st->time_base,
-						AV_TIME_BASE_Q);
+				AV_TIME_BASE_Q);
 				delta = pkt_pts - ist->next_dts;
 				if (delta < -1LL * dts_error_threshold * AV_TIME_BASE
 						|| delta > 1LL * dts_error_threshold * AV_TIME_BASE) {
@@ -3782,7 +3783,7 @@ static int process_input(int file_index) {
 
 	if (pkt.dts != AV_NOPTS_VALUE)
 		ifile->last_ts = av_rescale_q(pkt.dts, ist->st->time_base,
-				AV_TIME_BASE_Q);
+		AV_TIME_BASE_Q);
 
 	if (debug_ts) {
 		av_log(NULL, AV_LOG_INFO,
@@ -4066,15 +4067,25 @@ int main(int argc, char **argv) {
 	int ret;
 	int64_t ti;
 	cjy_out = NULL;
+	for (int i = 0; i < 2; i++) {
+		if (argc > 1 && !strcmp(argv[1], "-cjy_folder")) {
+			memcpy(cjy_folder, argv[2], strlen(argv[2]) + 1);
+			argv[2] = argv[0];
+			//cjy_folder = argv[2];
+			argc -= 2;
+			argv += 2;
+			continue;
+		}
+		if (argc > 1 && !strcmp(argv[1], "-cjy_yuvout")) {
+			memcpy(cjy_yuvout, argv[2], strlen(argv[2]) + 1);
+			//cjy_folder = argv[2];
+			argv[2] = argv[0];
+			argc -= 2;
+			argv += 2;
 
-	if (argc > 1 && !strcmp(argv[1], "-cjy_folder")) {
-		memcpy(cjy_folder, argv[2], strlen(argv[2]) + 1);
-
-		//cjy_folder = argv[2];
-		argc -= 2;
-		argv += 2;
+			continue;
+		}
 	}
-	fprintf(stderr, "%d\n", strlen(cjy_folder));
 	register_exit(ffmpeg_cleanup);
 
 	setvbuf(stderr, NULL, _IONBF, 0); /* win32 runtime needs this */

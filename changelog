@@ -6,3 +6,4 @@
 6 mpegvideo.c put_dct 输出量化后的DCT系数
 7 mpegvideo.h add function prototype
 8 encode -threads 1 -s cif -pix_fmt yuv420p -i test/%4d.png -c:v libxvid -g -mpeg_quant 1 -q 5 -flags +mv4 -threads 1 akiyo_test.m4v
+9 xvid.h xvid.c 中加入了2个外部变量cjy_xvid_folder和cjy_input,后者用于输出输入图像的像素值，复制在libxvid.c中。

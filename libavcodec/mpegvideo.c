@@ -2970,6 +2970,18 @@ static inline void put_dct(MpegEncContext *s, int16_t *block, int i,
 	}
 	s->dct_unquantize_intra(s, block, i, qscale);
 	s->idsp.idct_put(dest, line_size, block);
+	//changed by cjy
+	if (print) {
+		fprintf(cjy_out, "Output:\n");
+		for (int k = 0; k < 8; k++) {
+			for (int l = 0; l < 8; l++) {
+				fprintf(cjy_out, "%5d", dest[l + k * line_size]);
+			}
+			fprintf(cjy_out, ";\n");
+		}
+		fprintf(cjy_out, "\n");
+	}
+
 }
 
 /* add block[] to dest[] */
@@ -3030,9 +3042,22 @@ static inline void add_dequant_dct(MpegEncContext *s, int16_t *block, int i,
 				fprintf(cjy_out, "    0");
 
 			}
-			fprintf(cjy_out, "\n\n");
+			fprintf(cjy_out, "\n");
 		}
 	}
+
+	//changed by cjy
+	if (print) {
+		fprintf(cjy_out, "Output:\n");
+		for (int k = 0; k < 8; k++) {
+			for (int l = 0; l < 8; l++) {
+				fprintf(cjy_out, "%5d", dest[l + k * line_size]);
+			}
+			fprintf(cjy_out, ";\n");
+		}
+		fprintf(cjy_out, "\n");
+	}
+
 }
 
 /**
@@ -3172,8 +3197,8 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 	}
 	if (print) {
 
-		fprintf(cjy_out, "MB at %dx%d : QScale = %-3d MB_TYPE = ", s->mb_x,
-				s->mb_y, s->qscale);
+		fprintf(cjy_out, "MB at %dx%d : QScale = %-3d Rounding = %-3d MB_TYPE = ", s->mb_x,
+				s->mb_y, s->qscale, s->no_rounding ^ 1);
 		mb_type = s->current_picture.mb_type[mb_xy];
 		// Type & MV direction
 		if (IS_PCM(mb_type))

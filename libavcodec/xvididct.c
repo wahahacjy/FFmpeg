@@ -340,7 +340,7 @@ void ff_xvid_idct(int16_t *const in)
 			fprintf(cjy_out, "%5d", in[j]);
 
 		}
-		fprintf(cjy_out, ";\n\n");
+		fprintf(cjy_out, ";\n");
 	}
 }
 
