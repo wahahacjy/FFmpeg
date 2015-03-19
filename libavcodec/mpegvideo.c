@@ -3183,7 +3183,7 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 				av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
 		/* print DCT coefficients */
 		int i, j;
-		fprintf(stderr, "Quantized DCT coeffs of MB at %dx%d:\n", s->mb_x,
+		fprintf(stderr, "Frame %-4d, Quantized DCT coeffs of MB at %dx%d:\n", s->picture_number, s->mb_x,
 				s->mb_y);
 		for (i = 0; i < 6; i++) {
 			int k = 0;

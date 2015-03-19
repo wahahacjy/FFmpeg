@@ -1705,7 +1705,9 @@ int ff_mpv_encode_picture(AVCodecContext *avctx, AVPacket *pkt,
     MpegEncContext *s = avctx->priv_data;
     int i, stuffing_count, ret;
     int context_count = s->slice_context_count;
-
+	extern int print;
+	extern FILE *cjy_out;
+	extern char cjy_folder[];
     s->picture_in_gop_number++;
 
     if (load_input_picture(s, pic_arg) < 0)
@@ -1714,6 +1716,29 @@ int ff_mpv_encode_picture(AVCodecContext *avctx, AVPacket *pkt,
     if (select_input_picture(s) < 0) {
         return -1;
     }
+
+    //changed by cjy
+	if (print) {
+		if (cjy_out != NULL && cjy_out != stdout)
+			fclose(cjy_out);
+		if (strlen(cjy_folder) > 0) {
+			char *file = malloc(10 + strlen(cjy_folder));
+			sprintf(file, "%s/%04d_%1c", cjy_folder, s->picture_number + 1,
+					av_get_picture_type_char(
+							s->current_picture_ptr->f->pict_type));
+			//printf("%s\n", file);
+			cjy_out = fopen(file, "w");
+			if (cjy_out == NULL) {
+				fprintf(stderr, "File open failed!\n");
+				exit(1);
+			}
+			free(file);
+			file = NULL;
+		} else {
+			cjy_out = stdout;
+		}
+		//fprintf(cjy_out, "Frame %-4d, type: %c\n", s->picture_number, av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+	}
 
     /* output? */
     if (s->new_picture.f->data[0]) {

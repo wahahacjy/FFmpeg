@@ -4066,9 +4066,10 @@ static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 int main(int argc, char **argv) {
 	int ret;
 	int64_t ti;
-	cjy_out = NULL;
+	cjy_out = stdout;
 	for (int i = 0; i < 2; i++) {
 		if (argc > 1 && !strcmp(argv[1], "-cjy_folder")) {
+			//printf("cjy_folder: %s", argv[2]);
 			memcpy(cjy_folder, argv[2], strlen(argv[2]) + 1);
 			argv[2] = argv[0];
 			//cjy_folder = argv[2];

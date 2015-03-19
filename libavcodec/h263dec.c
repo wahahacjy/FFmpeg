@@ -266,9 +266,8 @@ static int decode_slice(MpegEncContext *s) {
 					av_log(s->avctx, AV_LOG_ERROR, "Slice mismatch at MB: %d\n",
 							xy);
 					ff_er_add_slice(&s->er, s->resync_mb_x, s->resync_mb_y,
-							s->mb_x + 1, s->mb_y,
-							ER_MB_END & part_mask);
-					return AVERROR_INVALIDDATA;
+							s->mb_x + 1, s->mb_y, ER_MB_END & part_mask);
+					return AVERROR_INVALIDDATA ;
 				}
 				av_log(s->avctx, AV_LOG_ERROR, "Error at MB: %d\n", xy);
 				ff_er_add_slice(&s->er, s->resync_mb_x, s->resync_mb_y, s->mb_x,
@@ -276,7 +275,7 @@ static int decode_slice(MpegEncContext *s) {
 
 				if (s->err_recognition & AV_EF_IGNORE_ERR)
 					continue;
-				return AVERROR_INVALIDDATA;
+				return AVERROR_INVALIDDATA ;
 			}
 
 			ff_mpv_decode_mb(s, s->block);
@@ -333,8 +332,8 @@ static int decode_slice(MpegEncContext *s) {
 
 	if (s->codec_id == AV_CODEC_ID_H263
 			&& (s->workaround_bugs & FF_BUG_AUTODETECT)
-			&& get_bits_left(&s->gb) >= 64 &&
-			AV_RB64(s->gb.buffer_end - 8) == 0xCDCDCDCDFC7F0000) {
+			&& get_bits_left(&s->gb) >= 64
+			&& AV_RB64(s->gb.buffer_end - 8) == 0xCDCDCDCDFC7F0000) {
 
 		s->padding_bug_score += 32;
 	}
@@ -381,9 +380,9 @@ static int decode_slice(MpegEncContext *s) {
 			get_bits_left(&s->gb), show_bits(&s->gb, 24), s->padding_bug_score);
 
 	ff_er_add_slice(&s->er, s->resync_mb_x, s->resync_mb_y, s->mb_x, s->mb_y,
-	ER_MB_END & part_mask);
+			ER_MB_END & part_mask);
 
-	return AVERROR_INVALIDDATA;
+	return AVERROR_INVALIDDATA ;
 }
 
 int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
@@ -543,7 +542,7 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 		if (avctx->pix_fmt != h263_get_format(avctx)) {
 			av_log(avctx, AV_LOG_ERROR, "format change not supported\n");
 			avctx->pix_fmt = AV_PIX_FMT_NONE;
-			return AVERROR_UNKNOWN;
+			return AVERROR_UNKNOWN ;
 		}
 	}
 
@@ -616,6 +615,9 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
 	//changed by cjy
 	if (print) {
+		/*if (s->picture_number == 262) {
+			printf("262 in h263dec.c\n");
+		}*/
 		if (cjy_out != NULL && cjy_out != stdout)
 			fclose(cjy_out);
 		if (strlen(cjy_folder) > 0) {
@@ -623,6 +625,8 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 			sprintf(file, "%s/%04d_%1c", cjy_folder, s->picture_number,
 					av_get_picture_type_char(
 							s->current_picture_ptr->f->pict_type));
+			//printf("%s\n", file);
+
 			cjy_out = fopen(file, "w");
 			if (cjy_out == NULL) {
 				fprintf(stderr, "File open failed!\n");
