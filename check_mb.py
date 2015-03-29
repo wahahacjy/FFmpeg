@@ -43,7 +43,7 @@ if(len(sys.argv) > 2):
             video = sys.argv[i];
         if(sys.argv[i] == "-r"):
             i = i + 1;
-            root = sys.argv[i];
+            root = sys.argv[i] + "/";
         if(sys.argv[i] == "-q"):
             i = i + 1;
             qs = sys.argv[i];

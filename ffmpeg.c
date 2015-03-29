@@ -150,6 +150,7 @@ static struct termios oldtty;
 static int restore_tty;
 #endif
 int print = 0;
+int only_mb_type = 0;
 FILE *cjy_out;
 char cjy_folder[100] = {0};
 char cjy_yuvout[100] = {0};
@@ -4067,7 +4068,7 @@ int main(int argc, char **argv) {
 	int ret;
 	int64_t ti;
 	cjy_out = stdout;
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < 3; i++) {
 		if (argc > 1 && !strcmp(argv[1], "-cjy_folder")) {
 			//printf("cjy_folder: %s", argv[2]);
 			memcpy(cjy_folder, argv[2], strlen(argv[2]) + 1);
@@ -4083,6 +4084,13 @@ int main(int argc, char **argv) {
 			argv[2] = argv[0];
 			argc -= 2;
 			argv += 2;
+
+			continue;
+		}
+		if (argc > 1 && !strcmp(argv[1], "-only_mb")) {
+			only_mb_type = 1;
+			argc -= 1;
+			argv += 1;
 
 			continue;
 		}

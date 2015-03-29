@@ -47,8 +47,10 @@
 #include "thread.h"
 #include <limits.h>
 
+//changed by cjy
 extern int print;
 extern FILE *cjy_out;
+extern int only_mb_type;
 static const uint8_t ff_default_chroma_qscale_table[32] = {
 //   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -2956,7 +2958,7 @@ int ff_mpv_lowest_referenced_row(MpegEncContext *s, int dir) {
 static inline void put_dct(MpegEncContext *s, int16_t *block, int i,
 		uint8_t *dest, int line_size, int qscale) {
 	//changed by cjy
-	if (print) {
+	if (print && !only_mb_type) {
 		fprintf(cjy_out, "Block %d\n", i);
 		fprintf(cjy_out, "Quantized DCT coeffs\n");
 		for (int j = 0; j < 64; j++) {
@@ -2971,7 +2973,7 @@ static inline void put_dct(MpegEncContext *s, int16_t *block, int i,
 	s->dct_unquantize_intra(s, block, i, qscale);
 	s->idsp.idct_put(dest, line_size, block);
 	//changed by cjy
-	if (print) {
+	if (print && !only_mb_type) {
 		fprintf(cjy_out, "Output:\n");
 		for (int k = 0; k < 8; k++) {
 			for (int l = 0; l < 8; l++) {
@@ -2995,7 +2997,7 @@ FILE *in;
 static inline void add_dequant_dct(MpegEncContext *s, int16_t *block, int i,
 		uint8_t *dest, int line_size, int qscale) {
 	//changed by cjy
-	if (print) {
+	if (print && !only_mb_type) {
 		if (s->block_last_index[i] >= 0) {
 			fprintf(cjy_out, "Block %d\n", i);
 			fprintf(cjy_out, "Quantized DCT coeffs\n");
@@ -3026,7 +3028,7 @@ static inline void add_dequant_dct(MpegEncContext *s, int16_t *block, int i,
 	//changed by cjy
 	else {
 
-		if (print) {
+		if (print && !only_mb_type) {
 			fprintf(cjy_out, "Dequantized DCT coeffs\n");
 			for (int j = 0; j < 64; j++) {
 				if (j != 0 && j % 8 == 0)
@@ -3047,7 +3049,7 @@ static inline void add_dequant_dct(MpegEncContext *s, int16_t *block, int i,
 	}
 
 	//changed by cjy
-	if (print) {
+	if (print && !only_mb_type) {
 		fprintf(cjy_out, "Output:\n");
 		for (int k = 0; k < 8; k++) {
 			for (int l = 0; l < 8; l++) {

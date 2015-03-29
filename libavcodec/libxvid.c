@@ -357,8 +357,9 @@ static av_cold int xvid_encode_init(AVCodecContext *avctx) {
 	xvid_enc_plugin_t plugins[4];
 
 	extern char cjy_folder[];
+	extern int only_mb_type;
 	//extern char *cjy_xvid_folder;
-	if (strlen(cjy_folder) > 0)
+	if (strlen(cjy_folder) > 0 && !only_mb_type)
 		cjy_xvid_folder = cjy_folder;
 	else
 		cjy_xvid_folder = NULL;

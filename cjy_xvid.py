@@ -8,14 +8,14 @@ flags = "";
 
 def encode(src, save_folder, dst, qs, is_yuvout, yuv_folder):
     if is_yuvout > 1:
-        enccmd = FFMPEG + "-cjy_folder " + save_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v libxvid -g 5 -mpeg_quant 1 -q " + qs + flags + " -threads 1 " + dst + " 2>/dev/null";
+        enccmd = FFMPEG + "-only_mb -cjy_folder " + save_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v libxvid -g 5 -mpeg_quant 1 -q " + qs + flags + " -threads 1 -y " + dst + " 2>/dev/null";
     else:
-        enccmd = FFMPEG + "-cjy_folder " + save_folder + " -cjy_yuvout " + yuv_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v libxvid -g 5 -mpeg_quant 1 -q " + qs + flags + " -threads 1 " + dst + " 2>/dev/null";
+        enccmd = FFMPEG + "-only_mb -cjy_folder " + save_folder + " -cjy_yuvout " + yuv_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v libxvid -g 5 -mpeg_quant 1 -q " + qs + flags + " -threads 1 -y " + dst + " 2>/dev/null";
     print enccmd;
     subprocess.call(enccmd, shell=True)
 
 def decode(src, save_foder, dst):
-    deccmd = FFMPEG + "-cjy_folder " + save_foder + " -threads 1 -i " + src + " " + dst + " 2>/dev/null";
+    deccmd = FFMPEG + "-only_mb -cjy_folder " + save_foder + " -threads 1 -i " + src + " -y " + dst + " 2>/dev/null";
     print deccmd;
     subprocess.call(deccmd, shell=True);
 
@@ -44,6 +44,7 @@ if(len(sys.argv) > 1):
             i += 2;
         elif(sys.argv[i] == "-r"):
             result_folder = sys.argv[i + 1];
+            result_folder += "/";
             i += 2;
         elif(sys.argv[i] == "-n"):
             num = int(sys.argv[i + 1]);
