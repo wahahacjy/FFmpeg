@@ -619,7 +619,9 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 			printf("262 in h263dec.c\n");
 		}*/
 		if (cjy_out != NULL && cjy_out != stdout)
+		{
 			fclose(cjy_out);
+		}
 		if (strlen(cjy_folder) > 0) {
 			char *file = malloc(10 + strlen(cjy_folder));
 			sprintf(file, "%s/%04d_%1c", cjy_folder, s->picture_number,
@@ -639,6 +641,7 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 		}
 		//fprintf(cjy_out, "Frame %-4d, type: %c\n", s->picture_number, av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
 	}
+
 	/* decode each macroblock */
 	s->mb_x = 0;
 	s->mb_y = 0;

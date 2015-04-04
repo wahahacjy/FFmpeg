@@ -49,6 +49,9 @@ if(len(sys.argv) > 1):
         elif(sys.argv[i] == "-n"):
             num = int(sys.argv[i + 1]);
             i += 2;
+        elif(sys.argv[i] == "-yuv"):
+            yuv_folder = sys.argv[i + 1] + "/";
+            i += 2;
         else:
             print "Wrong para";
             exit(-1);

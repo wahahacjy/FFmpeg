@@ -4068,6 +4068,7 @@ int main(int argc, char **argv) {
 	int ret;
 	int64_t ti;
 	cjy_out = stdout;
+
 	for (int i = 0; i < 3; i++) {
 		if (argc > 1 && !strcmp(argv[1], "-cjy_folder")) {
 			//printf("cjy_folder: %s", argv[2]);
@@ -4145,7 +4146,8 @@ int main(int argc, char **argv) {
 //         av_log(NULL, AV_LOG_FATAL, "At least one input file must be specified\n");
 //         exit_program(1);
 //     }
-	print = 1;
+	if(cjy_folder != NULL)
+		print = 1;
 	current_time = ti = getutime();
 	if (transcode() < 0)
 		exit_program(1);

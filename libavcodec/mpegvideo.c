@@ -2141,10 +2141,6 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict,
 				2 * 4 * sizeof(AVMotionVector));
 		if (!mvs)
 			return;
-		if (print) {
-			cjy_out = stderr;
-			fprintf(cjy_out, "MV: ");
-		}
 		for (mb_y = 0; mb_y < mb_height; mb_y++) {
 			for (mb_x = 0; mb_x < mb_width; mb_x++) {
 				int i, direction, mb_type =
@@ -2165,11 +2161,11 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict,
 									+ sy;
 							mbcount += add_mb(mvs + mbcount, mb_type, sx, sy,
 									mx, my, direction);
-							if (print) {
+							/*if (print) {
 								fprintf(cjy_out, "x: %4d, y:%4d ",
 										motion_val[direction][xy][0] >> shift,
 										motion_val[direction][xy][1] >> shift);
-							}
+							}*/
 						}
 					} else if (IS_16X8(mb_type)) {
 						for (i = 0; i < 2; i++) {
@@ -2185,11 +2181,11 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict,
 
 							mbcount += add_mb(mvs + mbcount, mb_type, sx, sy,
 									mx + sx, my + sy, direction);
-							if (print) {
+							/*if (print) {
 								fprintf(cjy_out, "x: %4d, y:%4d ",
 										motion_val[direction][xy][0] >> shift,
 										motion_val[direction][xy][1] >> shift);
-							}
+							}*/
 						}
 					} else if (IS_8X16(mb_type)) {
 						for (i = 0; i < 2; i++) {
@@ -2205,11 +2201,11 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict,
 
 							mbcount += add_mb(mvs + mbcount, mb_type, sx, sy,
 									mx + sx, my + sy, direction);
-							if (print) {
+							/*if (print) {
 								fprintf(cjy_out, "x: %4d, y:%4d ",
 										motion_val[direction][xy][0] >> shift,
 										motion_val[direction][xy][1] >> shift);
-							}
+							}*/
 						}
 					} else {
 						int sx = mb_x * 16 + 8;
@@ -2219,17 +2215,14 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict,
 						int my = (motion_val[direction][xy][1] >> shift) + sy;
 						mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx,
 								my, direction);
-						if (print) {
+						/*if (print) {
 							fprintf(cjy_out, "x: %4d, y:%4d ",
 									motion_val[direction][xy][0] >> shift,
 									motion_val[direction][xy][1] >> shift);
-						}
+						}*/
 					}
 				}
 			}
-		}
-		if (print) {
-			cjy_out = stdout;
 		}
 
 		if (mbcount) {
@@ -3184,7 +3177,7 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 		fprintf(cjy_out, "Frame %-4d,type: %c\n", s->picture_number,
 				av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
 		/* print DCT coefficients */
-		int i, j;
+		/*int i, j;
 		fprintf(stderr, "Frame %-4d, Quantized DCT coeffs of MB at %dx%d:\n", s->picture_number, s->mb_x,
 				s->mb_y);
 		for (i = 0; i < 6; i++) {
@@ -3195,9 +3188,7 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 					fprintf(stderr, ";");
 			}
 			fprintf(stderr, "\n");
-		}
-	}
-	if (print) {
+		}*/
 
 		fprintf(cjy_out, "MB at %dx%d : QScale = %-3d Rounding = %-3d MB_TYPE = ", s->mb_x,
 				s->mb_y, s->qscale, s->no_rounding ^ 1);
