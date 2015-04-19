@@ -7,9 +7,14 @@ def generate_generalize(inputfile, qs, feature_num):
         datas = line.split(', ');
         label1 = "+1 ";
         label2 = "-1 ";
+        count1 = 0;
+        count2 = 0;
+        for i in range(0, feature_num):
+            count1 += float(datas[i]);
+            count2 += float(datas[i + 1]);
         for j in range(0, feature_num):
-            label1 += str(j + 1) + ":" + str(float(datas[j]) / float(datas[0])) + " ";
-            label2 += str(j + 1) + ":" + str(float(datas[j + 1]) / float(datas[1])) + " ";
+            label1 += str(j + 1) + ":" + str(float(datas[j]) / count1) + " ";
+            label2 += str(j + 1) + ":" + str(float(datas[j + 1]) / count2) + " ";
         print label1;
         print label2;
         inputfile.readline();
@@ -32,7 +37,7 @@ def generate(inputfile, qs, feature_num):
 
 data_path = "/media/cjy/Exp/MBStatistic/newresult.txt";
 qs_start = 1;
-qs_end = 5;
+qs_end = 10;
 feature_num = 5;
 if(len(sys.argv) > 1):
     i = 1;
