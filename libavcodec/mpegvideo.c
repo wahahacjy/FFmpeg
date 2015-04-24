@@ -51,6 +51,7 @@
 extern int print;
 extern FILE *cjy_out;
 extern int only_mb_type;
+extern int frame_number;
 static const uint8_t ff_default_chroma_qscale_table[32] = {
 //   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -3174,8 +3175,14 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 	}
 	//changend by cjy
 	if (print) {
-		fprintf(cjy_out, "Frame %-4d,type: %c\n", s->picture_number,
+		if(!is_mpeg12){
+			fprintf(cjy_out, "Frame %-4d,type: %c\n", s->picture_number,
 				av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+		}
+		else{
+			fprintf(cjy_out, "Frame %-4d,type: %c\n", s->coded_picture_number,
+							av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+		}
 		/* print DCT coefficients */
 		/*int i, j;
 		fprintf(stderr, "Frame %-4d, Quantized DCT coeffs of MB at %dx%d:\n", s->picture_number, s->mb_x,

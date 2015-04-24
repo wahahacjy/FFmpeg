@@ -47,6 +47,11 @@
 #include "vdpau_internal.h"
 #include "xvmc_internal.h"
 
+//changed by cjy
+extern int print;
+extern FILE *cjy_out;
+extern char cjy_folder[];
+
 typedef struct Mpeg1Context {
     MpegEncContext mpeg_enc_ctx;
     int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
@@ -2404,6 +2409,7 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
     int picture_start_code_seen = 0;
 
     for (;;) {
+
         /* find next start code */
         uint32_t start_code = -1;
         buf_ptr = avpriv_find_start_code(buf_ptr, buf_end, &start_code);
@@ -2678,6 +2684,32 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
                     break;
                 }
 
+                //changed by cjy
+				if (print) {
+					if (cjy_out != NULL && cjy_out != stdout)
+					{
+						fclose(cjy_out);
+					}
+					if (strlen(cjy_folder) > 0) {
+						char *file = malloc(10 + strlen(cjy_folder));
+						sprintf(file, "%s/%04d_%1c", cjy_folder, s2->coded_picture_number,
+								av_get_picture_type_char(
+										s2->current_picture_ptr->f->pict_type));
+						//printf("%s\n", file);
+
+						cjy_out = fopen(file, "a");
+						if (cjy_out == NULL) {
+							fprintf(stderr, "File open failed!\n");
+							exit(1);
+						}
+						free(file);
+						file = NULL;
+					} else {
+						cjy_out = stdout;
+					}
+					//fprintf(cjy_out, "Frame %-4d, type: %c\n", s->picture_number, av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
+				}
+
                 if (HAVE_THREADS &&
                     (avctx->active_thread_type & FF_THREAD_SLICE) &&
                     !avctx->hwaccel) {
@@ -2733,6 +2765,7 @@ static int mpeg_decode_frame(AVCodecContext *avctx, void *data,
     AVFrame *picture = data;
     MpegEncContext *s2 = &s->mpeg_enc_ctx;
 
+
     if (buf_size == 0 || (buf_size == 4 && AV_RB32(buf) == SEQ_END_CODE)) {
         /* special case for last picture */
         if (s2->low_delay == 0 && s2->next_picture_ptr) {
@@ -2777,6 +2810,8 @@ static int mpeg_decode_frame(AVCodecContext *avctx, void *data,
             return ret;
         }
     }
+
+
 
     ret = decode_chunks(avctx, picture, got_output, buf, buf_size);
     if (ret<0 || *got_output)

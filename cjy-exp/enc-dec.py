@@ -35,11 +35,19 @@ def encode_mpeg4native(src, save_folder, dst, qs, is_yuvout, yuv_folder):
     print enccmd;
     subprocess.call(enccmd, shell=True)
 
-def encode_mpeg2video(src, save_folder, dst, qs, is_yuvout, yuv_folder):
+def encode_mpeg4native(src, save_folder, dst, qs, gop, is_yuvout, yuv_folder):
     if is_yuvout > 1:
-        enccmd = FFMPEG + "-threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg2video -g 5 -mpeg_quant 1 -q " + qs + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
+        enccmd = FFMPEG + "-threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg4 -g " + gop + " -mpeg_quant 1 -q " + qs + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
     else:
-        enccmd = FFMPEG + "-cjy_yuvout " + yuv_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg2video -g 5 -mpeg_quant 1 -q " + qs + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
+        enccmd = FFMPEG + "-cjy_yuvout " + yuv_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg4 -g " + gop + " -mpeg_quant 1 -q " + qs + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
+    print enccmd;
+    subprocess.call(enccmd, shell=True)
+
+def encode_mpeg2video(src, save_folder, dst, qs, gop, is_yuvout, yuv_folder):
+    if is_yuvout > 1:
+        enccmd = FFMPEG + "-threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg2video -g " + gop + " -q " + qs + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
+    else:
+        enccmd = FFMPEG + "-cjy_yuvout " + yuv_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg2video -g " + gop + " -q " + qs + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
     print enccmd;
     subprocess.call(enccmd, shell=True)
 
@@ -85,7 +93,7 @@ if not os.path.exists(yuv_save_folder):
 for i in range (1,num):
     folder = result_folder + video + "_q" + qs;
     save_folder = folder + "/" + video + "_q" + qs + "_" + str(i) + "_enc";
-    dst = folder + "/" + video + "_q" + qs + "_" + str(i) + ".m4v";
+    dst = folder + "/" + video + "_q" + qs + "_" + str(i) + ".avi";
 
     if(i > 1 and origin == 1):
         src = folder + "/" + video + "_q" + qs + "_" + str(i - 1) + ".yuv";
@@ -95,8 +103,9 @@ for i in range (1,num):
         os.makedirs(save_folder);
     
 #encode
-    #encode_mpeg4native(src, save_folder, dst, qs, i, yuv_save_folder);
-    encode_xvid(src, save_folder, dst, qs, gop, i, yuv_save_folder);
+    encode_mpeg2video(src, save_folder, dst, qs, gop, i, yuv_save_folder);
+    #encode_mpeg4native(src, save_folder, dst, qs, gop, i, yuv_save_folder);
+    #encode_xvid(src, save_folder, dst, qs, gop, i, yuv_save_folder);
 
 #decode
     save_folder = folder + "/" + video + "_q" + qs + "_" + str(i) + "_dec";
