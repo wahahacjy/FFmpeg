@@ -43,6 +43,14 @@ def encode_mpeg4native(src, save_folder, dst, qs, gop, is_yuvout, yuv_folder):
     print enccmd;
     subprocess.call(enccmd, shell=True)
 
+def encode_mpeg4native_cbr(src, save_folder, dst, bitrate, gop, is_yuvout, yuv_folder):
+    if is_yuvout > 1:
+        enccmd = FFMPEG + "-threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg4 -g " + gop + " -b:v " + bitrate + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
+    else:
+        enccmd = FFMPEG + "-cjy_yuvout " + yuv_folder + " -threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg4 -g " + gop + " -b:v " + bitrate + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
+    print enccmd;
+    subprocess.call(enccmd, shell=True)
+
 def encode_mpeg2video_cbr(src, save_folder, dst, bitrate, gop, is_yuvout, yuv_folder):
     if is_yuvout > 1:
         enccmd = FFMPEG + "-threads 1 -s cif -pix_fmt yuv420p -i " + src + " -c:v mpeg2video -g " + gop + " -b:v " + bitrate + flags + " -threads 1 " + dst + " >/dev/null 2>&1";
@@ -103,7 +111,8 @@ for i in range (1,num):
         os.makedirs(save_folder);
     
 #encode
-    encode_mpeg2video_cbr(src, save_folder, dst, bitrate, gop, i, yuv_save_folder);
+    #encode_mpeg2video_cbr(src, save_folder, dst, bitrate, gop, i, yuv_save_folder);
+    encode_mpeg4native_cbr(src, save_folder, dst, bitrate, gop, i, yuv_save_folder);
     #encode_mpeg4native(src, save_folder, dst, qs, gop, i, yuv_save_folder);
     #encode_xvid(src, save_folder, dst, qs, gop, i, yuv_save_folder);
 

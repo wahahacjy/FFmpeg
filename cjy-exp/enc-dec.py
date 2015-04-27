@@ -103,8 +103,8 @@ for i in range (1,num):
         os.makedirs(save_folder);
     
 #encode
-    encode_mpeg2video(src, save_folder, dst, qs, gop, i, yuv_save_folder);
-    #encode_mpeg4native(src, save_folder, dst, qs, gop, i, yuv_save_folder);
+    #encode_mpeg2video(src, save_folder, dst, qs, gop, i, yuv_save_folder);
+    encode_mpeg4native(src, save_folder, dst, qs, gop, i, yuv_save_folder);
     #encode_xvid(src, save_folder, dst, qs, gop, i, yuv_save_folder);
 
 #decode

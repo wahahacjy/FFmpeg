@@ -1,15 +1,15 @@
 #!/bin/bash
 #用于生成各种实验数据
 
-result_folder="/media/cjy/mi/MBStatistic-mp4native-gop10-q2"
+result_folder="/media/cjy/mi/MBStatistic-mp4native-gop10-q10"
 #result_folder="/media/cjy/Exp/MBStatistic-gop10"
-yuv_folder="~/Desktop/YUV-q2"
-svm_txt="native-q1-q10-g10-q2-svm.txt"
+yuv_folder="~/Desktop/YUV-q10"
+svm_txt="native-q1-q10-g10-q10-svm.txt"
 run_folder="/home/cjy/cuda-workspace/ffmpeg/cjy-exp"
 gop=10
 compress_number=8
 #修改这里的yuv文件夹！！
-allvideos=`ls ~/Desktop/YUV-q2/ | grep .yuv | cut -d _ -f 1`;
+allvideos=`ls ~/Desktop/YUV-q10/ | grep .yuv | cut -d _ -f 1`;
 echo $allvideos
 videos=($allvideos);
 for video in ${videos[@]}
@@ -26,4 +26,4 @@ do
 done
 done
 python ${run_folder}/calresult.py -root $result_folder > $result_folder/data.txt
-python ${run_folder}/generatefeature.py -data $result_folder/data.txt -qend 10  > $result_folder/$svm_txt
+python ${run_folder}/generatefeature-diffq.py -data $result_folder/data.txt -qend 10  > $result_folder/$svm_txt

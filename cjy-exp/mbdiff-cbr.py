@@ -26,7 +26,9 @@ result_folder = root + "/" + video + "_b" + bitrate + "/mbdiff";
 #checkpath
 if not os.path.exists(result_folder):
     os.makedirs(result_folder);
-
+else:
+    rm_cmd = "rm -f " + result_folder + "/*";
+    subprocess.call(rm_cmd, shell=True);
 #determine num
 num = 1;
 while(os.path.exists(root+ "/" + video + "_b" + bitrate + "/" + video + "_b" + bitrate + "_" + str(num) + "_dec")):
