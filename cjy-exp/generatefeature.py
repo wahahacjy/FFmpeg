@@ -19,8 +19,7 @@ def generate_generalize(inputfile, qs, feature_num):
         print label2;
         inputfile.readline();
 
-def generate(inputfile, qs, feature_num):
-    for i in qs:
+def generate(inputfile, feature_num):
         line = inputfile.readline().strip('\n')[1:-1];
         datas = line.split(', ');
         label1 = "+1 ";
@@ -30,7 +29,6 @@ def generate(inputfile, qs, feature_num):
             label2 += str(j + 1) + ":" + datas[j + 1] + " ";
         print label1;
         print label2;
-        inputfile.readline();
 
 
 
@@ -68,8 +66,10 @@ qs = range(qs_start, qs_end + 1);
 
 line = datafile.readline();
 while(line):
-    if(("q" + str(qs[0]) + " ") in line):
-        generate(datafile, qs, feature_num);
+    if("q" in line):
+        q = int(line[1:line.index("frame") - 1])
+        if(q in qs):
+            generate(datafile, feature_num);
     line = datafile.readline();
 
     

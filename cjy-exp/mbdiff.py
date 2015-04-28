@@ -7,6 +7,7 @@ video = "akiyo";
 root = "/home/cjy/Desktop/MBStatistic+mv4/";
 i = 1;
 qs = '0';
+frames = 100;
 while(i < len(sys.argv) - 1):
     if(sys.argv[i] == "-v"):
         i = i + 1;
@@ -19,6 +20,10 @@ while(i < len(sys.argv) - 1):
     elif(sys.argv[i] == "-q"):
         i = i + 1;
         qs = sys.argv[i];
+        i = i + 1;
+    elif(sys.argv[i] == "-f"):
+        i = i + 1;
+        frames = int(sys.argv[i]);
         i = i + 1;
     else:
         print "Wrong para";
@@ -38,6 +43,6 @@ num -= 1;
 print "num = " + str(num);
 for i in range (1, num):
     if(int(qs) > 0):
-        check_cmd = "python " + check_mb + " " + str(i) + " " + str(i + 1) + " -v " + video + " -r " + root + " -q " + qs + " > " + result_folder + "/" + str(i) + "_" + str(i + 1) + ".txt 2>>" + result_folder + "/diff.txt" ;
+        check_cmd = "python " + check_mb + " " + str(i) + " " + str(i + 1) + " -v " + video + " -r " + root + " -q " + qs + " -f " + str(frames) + " > " + result_folder + "/" + str(i) + "_" + str(i + 1) + ".txt 2>>" + result_folder + "/diff.txt" ;
         print check_cmd;
         subprocess.call(check_cmd, shell=True);

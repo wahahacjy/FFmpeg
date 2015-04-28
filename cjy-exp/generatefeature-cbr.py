@@ -2,7 +2,6 @@ import sys
 import os
 
 def generate(inputfile, bt, feature_num):
-    for i in bt:
         line = inputfile.readline().strip('\n')[1:-1];
         datas = line.split(', ');
         label1 = "+1 ";
@@ -12,7 +11,6 @@ def generate(inputfile, bt, feature_num):
             label2 += str(j + 1) + ":" + datas[j + 1] + " ";
         print label1;
         print label2;
-        inputfile.readline();
 
 
 
@@ -75,7 +73,9 @@ else:
     line = datafile.readline();
     while(line):
         if("bitrate: " in line):
-            generate(datafile, bt, feature_num);
+            bitrate = int(line[len("bitrate: "):line.index("k frame")]);
+            if(bitrate in bt):
+                generate(datafile, bt, feature_num);
         line = datafile.readline();
 
     

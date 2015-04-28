@@ -37,12 +37,16 @@ def count_p_frame_number(root, video, qs):
 
 root = '/media/cjy/Exp/MBStatistic';
 size = 352 * 288 / 64
+p_frames = 270;
 if(len(sys.argv) > 1):
     i = 1;
     while(i < len(sys.argv)):
         if(sys.argv[i] == "-root"):
             i += 1;
             root = sys.argv[i];
+        elif(sys.argv[i] == "-pf"):
+            i += 1;
+            p_frames = int(sys.argv[i]);
         else:
             print "Wrong Para";
             exit(-1);
@@ -55,15 +59,25 @@ for video in video_list:
     print video;
     for qs in qs_list:
         #only calculate the P-frames
-        frame_number = count_p_frame_number(root, video, qs);
-        print "q" + str(qs) + " frame: " + str(frame_number);
+        #frame_number = count_p_frame_number(root, video, qs);
         data_list = list();
         filename = root + "/" + video + "_q" + str(qs) + "/mbdiff/diff.txt";
         data = open(filename);
+        times = 1;
         for line in data:
             #line = line.strip('\n');
             if("P-mb" in line):
-                diff_in_one_frame = float(line[line.index("=") + 2: -1]);
-                diff_per_frame = "%.2f" %  (diff_in_one_frame / (frame_number));
-                data_list.append(float(diff_per_frame));
-        print data_list;
+                diff = line[line.index("=") + 2: -1];
+                diff_in_seg = diff.split(',');
+                if(times == 1):
+                    for i in range (0, len(diff_in_seg)):
+                        data_list.append(list());
+                index = 0;
+                for dif in diff_in_seg:
+                    diff_per_frame = "%.2f" %  (float(dif) / (p_frames));
+                    data_list[index].append(float(diff_per_frame));
+                    index += 1;
+                times += 1;
+        for result in data_list:
+            print "q" + str(qs) + " frame: " + str(p_frames);
+            print result;
