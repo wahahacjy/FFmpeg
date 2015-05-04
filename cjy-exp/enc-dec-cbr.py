@@ -15,8 +15,8 @@ def encode_xvid_cbr(src, save_folder, dst, bitrate, gop, is_yuvout, yuv_folder):
     print enccmd;
     subprocess.call(enccmd, shell=True)
 
-def decode(src, save_foder, dst):
-    deccmd = FFMPEG + "-only_mb -cjy_folder " + save_foder + " -threads 1 -i " + src + " -y " + dst + " 2>/dev/null";
+def decode(src, save_folder, dst):
+    deccmd = FFMPEG + "-only_mb -cjy_folder " + save_folder + " -threads 1 -i " + src + " -y " + dst + " 2>/dev/null";
     print deccmd;
     subprocess.call(deccmd, shell=True);
 

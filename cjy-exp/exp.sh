@@ -1,15 +1,15 @@
 #!/bin/bash
 #用于生成各种实验数据
 
-result_folder="/media/cjy/mi/MBStatistic-xvid-gop10"
+result_folder="/media/cjy/mi/MBStatistic-mp4native-gop10-mv4-qpel"
 #result_folder="/media/cjy/Exp/MBStatistic-gop10"
 yuv_folder="~/Desktop/YUV"
-svm_txt="xvid-q1-q15-g10-f100-svm.txt"
+svm_txt="native-q1-q15-g10-mv4-qpel-f100-svm.txt"
 run_folder="/home/cjy/cuda-workspace/ffmpeg/cjy-exp"
 gop=10
 compress_number=8
 frame_number=100
-encoder="xvid"
+encoder="mp4native"
 p_frame=$((${frame_number}-${frame_number}/${gop}))
 echo ${p_frame}
 #修改这里的yuv文件夹！！

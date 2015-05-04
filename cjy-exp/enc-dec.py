@@ -3,8 +3,8 @@ import subprocess
 import os
 
 FFMPEG = "/home/cjy/cuda-workspace/ffmpeg/ffmpeg_g" + " ";
-#flags = " -flags +mv4"
-flags = "";
+flags = " -flags +mv4+qpel"
+#flags = "";
 
 def encode_xvid(src, save_folder, dst, qs, gop, is_yuvout, yuv_folder):
     if is_yuvout > 1:
@@ -71,6 +71,8 @@ if(len(sys.argv) > 1):
                 encoder = encode_xvid;
             elif(sys.argv[i + 1] == "mp2"):
                 encoder = encode_mpeg2video;
+            elif(sys.argv[i + 1] == "mp4native"):
+                encoder = encode_mpeg4native;
             i += 2;
         else:
             print "Wrong para";
