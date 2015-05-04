@@ -7,8 +7,9 @@ def count_videos(dirnames):
     video_set = set();
     qs_set = set();
     for i in range(0, len(dirnames)):
-        video_set.add(dirnames[i][0:dirnames[i].index('_')]);
-        qs_set.add(int(dirnames[i][dirnames[i].index('_q') + 2:]));
+        if('_' in dirnames[i]):
+            video_set.add(dirnames[i][0:dirnames[i].index('_')]);
+            qs_set.add(int(dirnames[i][dirnames[i].index('_q') + 2:]));
     qs_list = list(qs_set);
     qs_list.sort();
     video_list = list(video_set);
@@ -68,6 +69,8 @@ for video in video_list:
             #line = line.strip('\n');
             if("P-mb" in line):
                 diff = line[line.index("=") + 2: -1];
+                if(diff == ''):
+                    break;
                 diff_in_seg = diff.split(',');
                 if(times == 1):
                     for i in range (0, len(diff_in_seg)):

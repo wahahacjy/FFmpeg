@@ -1,11 +1,11 @@
 #!/bin/bash
 #用于生成各种实验数据
 
-result_folder="/media/cjy/mi/MBStatistic-mp2-gop10-cbr"
+result_folder="/media/cjy/mi/MBStatistic-xvid-gop10-cbr"
 #result_folder="/media/cjy/Exp/MBStatistic-gop10"
 yuv_folder="~/Desktop/YUV"
 run_folder="/home/cjy/cuda-workspace/ffmpeg/cjy-exp"
-svm_txt="mp2-g10-cbr-svm.txt"
+svm_txt="xvid-g10-cbr-f100-svm.txt"
 gop=10
 compress_number=8
 frame_number=100
@@ -17,20 +17,9 @@ videos=($allvideos);
 for video in ${videos[@]}
 do
     echo video = $video;
-    for((i=500;i<=1500;i+=100))
+    for((i=1000;i<=9000;i+=1000))
     do
-#        python ${run_folder}/enc-dec-cbr.py -v $video -n $compress_number -gop $gop -r $result_folder -b:v ${i}k -yuv $yuv_folder
-        mv ${result_folder}/${video}_b${i}k/mbdiff ${result_folder}/${video}_b${i}k/mbdiff-all
-        python ${run_folder}/mbdiff-cbr.py -v $video -root $result_folder -b:v ${i}k -f ${frame_number}
-        rm -f ${result_folder}/${video}_b${i}k/*.yuv;
-        rm -rf ${result_folder}/${video}_b${i}k/*_enc;
-        rm -rf ${result_folder}/${video}_b${i}k/*_yuv;
-        rm -rf ${result_folder}/${video}_b${i}k/*_[2-9].avi;
-    done
-    for((i=2000;i<=9000;i+=1000))
-    do
-#        python ${run_folder}/enc-dec-cbr.py -v $video -n $compress_number -gop $gop -r $result_folder -b:v ${i}k -yuv $yuv_folder
-        mv ${result_folder}/${video}_b${i}k/mbdiff ${result_folder}/${video}_b${i}k/mbdiff-all
+        python ${run_folder}/enc-dec-cbr.py -v $video -n $compress_number -gop $gop -r $result_folder -b:v ${i}k -yuv $yuv_folder
         python ${run_folder}/mbdiff-cbr.py -v $video -root $result_folder -b:v ${i}k -f ${frame_number}
         rm -f ${result_folder}/${video}_b${i}k/*.yuv;
         rm -rf ${result_folder}/${video}_b${i}k/*_enc;

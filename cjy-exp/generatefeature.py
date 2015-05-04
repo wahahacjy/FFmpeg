@@ -19,14 +19,14 @@ def generate_generalize(inputfile, qs, feature_num):
         print label2;
         inputfile.readline();
 
-def generate(inputfile, feature_num):
+def generate(inputfile, feature_num, mult = 1):
         line = inputfile.readline().strip('\n')[1:-1];
         datas = line.split(', ');
         label1 = "+1 ";
         label2 = "-1 ";
         for j in range(0, feature_num):
-            label1 += str(j + 1) + ":" + datas[j] + " ";
-            label2 += str(j + 1) + ":" + datas[j + 1] + " ";
+            label1 += str(j + 1) + ":" + str(float(datas[j]) * mult) + " ";
+            label2 += str(j + 1) + ":" + str(float(datas[j + 1]) * mult) + " ";
         print label1;
         print label2;
 
@@ -37,6 +37,8 @@ data_path = "/media/cjy/Exp/MBStatistic/newresult.txt";
 qs_start = 1;
 qs_end = 10;
 feature_num = 5;
+qcif = 0;
+mult = 1;
 if(len(sys.argv) > 1):
     i = 1;
     while(i < len(sys.argv)):
@@ -52,13 +54,17 @@ if(len(sys.argv) > 1):
         elif(sys.argv[i] == "-f"):
             feature_num = int(sys.argv[i + 1]);
             i += 2;
-
+        elif(sys.argv[i] == "-qcif"):
+            qcif = 1;
+            i += 1;
         else:
             print "Wrong parameters";
             exit(-1);
 if(qs_start > qs_end):
     print "qs error";
     eixt(-1);
+if(qcif):
+    mult = 4;
 #print "Data is " + data_path;
 #print "Output is " + output;
 datafile = open(data_path, "r");
@@ -69,7 +75,7 @@ while(line):
     if("q" in line):
         q = int(line[1:line.index("frame") - 1])
         if(q in qs):
-            generate(datafile, feature_num);
+            generate(datafile, feature_num, mult);
     line = datafile.readline();
 
     
