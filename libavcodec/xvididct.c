@@ -292,9 +292,9 @@ void ff_xvid_idct(int16_t *const in)
 {
 	//changed by cjy
 	extern FILE *cjy_out;
-	extern int print, only_mb_type;
+	extern int print, only_mb_type, is_markov;
     int i, rows = 0x07;
-    if(print && !only_mb_type)
+    if(print && !only_mb_type && !is_markov)
 	{
     	fprintf(cjy_out, "Dequantized DCT coeffs\n");
 		for(int j = 0; j < 64; j++)
@@ -330,7 +330,7 @@ void ff_xvid_idct(int16_t *const in)
         for (i = 0; i < 8; i++)
             idct_col_3(in + i);
     }
-    if(print && !only_mb_type)
+    if(print && !only_mb_type && !is_markov)
 	{
     	fprintf(cjy_out, "IDCT coeffs\n");
 		for(int j = 0; j < 64; j++)

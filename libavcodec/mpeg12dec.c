@@ -48,7 +48,7 @@
 #include "xvmc_internal.h"
 
 //changed by cjy
-extern int print;
+extern int print, is_markov;
 extern FILE *cjy_out;
 extern char cjy_folder[];
 
@@ -558,6 +558,13 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     const int qscale = s->qscale;
     int mismatch;
 
+    //changed by cjy
+    extern int print;
+    extern FILE *cjy_out;
+    extern int only_mb_type;
+    int cjy_block[64] = {0};
+
+
     /* DC coefficient */
     if (n < 4) {
         quant_matrix = s->intra_matrix;
@@ -576,6 +583,10 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     av_dlog(s->avctx, "dc=%d\n", block[0]);
     mismatch = block[0] ^ 1;
     i = 0;
+
+    //changed by cjy
+    cjy_block[0] = dc;
+
     if (s->intra_vlc_format)
         rl = &ff_rl_mpeg2;
     else
@@ -589,12 +600,18 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
             GET_RL_VLC(level, run, re, &s->gb, rl->rl_vlc[0],
                        TEX_VLC_BITS, 2, 0);
 
+
+
             if (level == 127) {
                 break;
             } else if (level != 0) {
                 i += run;
                 check_scantable_index(s, i);
                 j = scantable[i];
+
+                //changed by cjy
+                cjy_block[j] = level;
+
                 level = (level * qscale * quant_matrix[j]) >> 4;
                 level = (level ^ SHOW_SBITS(re, &s->gb, 1)) -
                         SHOW_SBITS(re, &s->gb, 1);
@@ -625,6 +642,20 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     block[63] ^= mismatch & 1;
 
     s->block_last_index[n] = i;
+
+    //changed by cjy
+	if(print && s->current_picture_ptr->f->pict_type == AV_PICTURE_TYPE_I && n < 4)
+	{
+		fprintf(cjy_out, "Quantized DCT coeff\n");
+		for(int ci = 0; ci < 64; ci++)
+		{
+			fprintf(cjy_out, "%5d", cjy_block[ci]);
+			if(ci % 8 == 7)
+				fprintf(cjy_out, ";\n");
+		}
+		fprintf(cjy_out, "\n");
+	}
+
     return 0;
 }
 
@@ -847,6 +878,14 @@ static int mpeg_decode_mb(MpegEncContext *s, int16_t block[12][64])
             ff_xvmc_pack_pblocks(s, -1); // inter are always full blocks
 
         if (s->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
+        	//changed by cjy
+        	extern int print;
+        	extern FILE *cjy_out;
+        	extern int only_mb_type;
+        	/*if(print && s->pict_type == AV_PICTURE_TYPE_I)
+        	{
+        		fprintf(cjy_out, "Quantized DCT:\n");
+        	}*/
             if (s->flags2 & CODEC_FLAG2_FAST) {
                 for (i = 0; i < 6; i++)
                     mpeg2_fast_decode_block_intra(s, *s->pblocks[i], i);
@@ -2696,8 +2735,10 @@ static int decode_chunks(AVCodecContext *avctx, AVFrame *picture,
 								av_get_picture_type_char(
 										s2->current_picture_ptr->f->pict_type));
 						//printf("%s\n", file);
-
-						cjy_out = fopen(file, "a");
+						if((is_markov && s2->current_picture_ptr->f->pict_type == AV_PICTURE_TYPE_I) || !is_markov)
+							cjy_out = fopen(file, "a");
+						else
+							cjy_out = stdout;
 						if (cjy_out == NULL) {
 							fprintf(stderr, "File open failed!\n");
 							exit(1);

@@ -51,7 +51,8 @@
 extern int print;
 extern FILE *cjy_out;
 extern int only_mb_type;
-extern int frame_number;
+extern int is_markov;
+//extern int frame_number;
 static const uint8_t ff_default_chroma_qscale_table[32] = {
 //   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -2952,7 +2953,7 @@ int ff_mpv_lowest_referenced_row(MpegEncContext *s, int dir) {
 static inline void put_dct(MpegEncContext *s, int16_t *block, int i,
 		uint8_t *dest, int line_size, int qscale) {
 	//changed by cjy
-	if (print && !only_mb_type) {
+	if (print && !only_mb_type && i < 4) {
 		fprintf(cjy_out, "Block %d\n", i);
 		fprintf(cjy_out, "Quantized DCT coeffs\n");
 		for (int j = 0; j < 64; j++) {
@@ -2967,7 +2968,7 @@ static inline void put_dct(MpegEncContext *s, int16_t *block, int i,
 	s->dct_unquantize_intra(s, block, i, qscale);
 	s->idsp.idct_put(dest, line_size, block);
 	//changed by cjy
-	if (print && !only_mb_type) {
+	if (print && !only_mb_type && !is_markov) {
 		fprintf(cjy_out, "Output:\n");
 		for (int k = 0; k < 8; k++) {
 			for (int l = 0; l < 8; l++) {
@@ -3175,6 +3176,7 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 	}
 	//changend by cjy
 	if (print) {
+
 		if(!is_mpeg12){
 			fprintf(cjy_out, "Frame %-4d,type: %c\n", s->picture_number,
 				av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
@@ -3184,17 +3186,20 @@ void mpv_decode_mb_internal(MpegEncContext *s, int16_t block[12][64],
 							av_get_picture_type_char(s->current_picture_ptr->f->pict_type));
 		}
 		/* print DCT coefficients */
-		/*int i, j;
-		fprintf(stderr, "Frame %-4d, Quantized DCT coeffs of MB at %dx%d:\n", s->picture_number, s->mb_x,
-				s->mb_y);
-		for (i = 0; i < 6; i++) {
-			int k = 0;
-			for (j = 0; j < 64; j++) {
-				fprintf(stderr, "%5d", block[i][s->idsp.idct_permutation[j]]);
-				if (++k % 8 == 0)
-					fprintf(stderr, ";");
+		/*if(s->current_picture_ptr->f->pict_type == AV_PICTURE_TYPE_I)
+		{
+			int i, j;
+			fprintf(cjy_out, "Frame %-4d, Quantized DCT coeffs of MB at %dx%d:\n", s->picture_number, s->mb_x,
+					s->mb_y);
+			for (i = 0; i < 6; i++) {
+				int k = 0;
+				for (j = 0; j < 64; j++) {
+					fprintf(cjy_out, "%5d", block[i][s->idsp.idct_permutation[j]]);
+					if (++k % 8 == 0)
+						fprintf(cjy_out, ";");
+				}
+				fprintf(cjy_out, "\n");
 			}
-			fprintf(stderr, "\n");
 		}*/
 
 		fprintf(cjy_out, "MB at %dx%d : QScale = %-3d Rounding = %-3d MB_TYPE = ", s->mb_x,

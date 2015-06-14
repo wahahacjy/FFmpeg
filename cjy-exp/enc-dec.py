@@ -3,8 +3,8 @@ import subprocess
 import os
 
 FFMPEG = "/home/cjy/cuda-workspace/ffmpeg/ffmpeg_g" + " ";
-flags = " -flags +mv4+qpel"
-#flags = "";
+#flags = " -flags +mv4+qpel"
+flags = "";
 
 def encode_xvid(src, save_folder, dst, qs, gop, is_yuvout, yuv_folder):
     if is_yuvout > 1:
@@ -15,7 +15,7 @@ def encode_xvid(src, save_folder, dst, qs, gop, is_yuvout, yuv_folder):
     subprocess.call(enccmd, shell=True)
 
 def decode(src, save_foder, dst):
-    deccmd = FFMPEG + "-only_mb -cjy_folder " + save_foder + " -threads 1 -i " + src + " -y " + dst + " 2>/dev/null";
+    deccmd = FFMPEG + "-markov -cjy_folder " + save_foder + " -threads 1 -i " + src + " -y " + dst + " >/dev/null 2>&1";
     print deccmd;
     subprocess.call(deccmd, shell=True);
 

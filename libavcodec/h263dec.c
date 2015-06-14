@@ -393,7 +393,7 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 	int ret;
 	int slice_ret = 0;
 	AVFrame *pict = data;
-	extern int print;
+	extern int print, is_markov;
 	extern FILE *cjy_out;
 	extern char cjy_folder[];
 	s->flags = avctx->flags;
@@ -616,10 +616,9 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 	//changed by cjy
 	if (print) {
 		/*if (s->picture_number == 262) {
-			printf("262 in h263dec.c\n");
-		}*/
-		if (cjy_out != NULL && cjy_out != stdout)
-		{
+		 printf("262 in h263dec.c\n");
+		 }*/
+		if (cjy_out != NULL && cjy_out != stdout) {
 			fclose(cjy_out);
 		}
 		if (strlen(cjy_folder) > 0) {
@@ -628,8 +627,10 @@ int ff_h263_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 					av_get_picture_type_char(
 							s->current_picture_ptr->f->pict_type));
 			//printf("%s\n", file);
-
-			cjy_out = fopen(file, "w");
+			if((is_markov && s->current_picture_ptr->f->pict_type == AV_PICTURE_TYPE_I) || !is_markov)
+				cjy_out = fopen(file, "w");
+			else
+				cjy_out = stdout;
 			if (cjy_out == NULL) {
 				fprintf(stderr, "File open failed!\n");
 				exit(1);
