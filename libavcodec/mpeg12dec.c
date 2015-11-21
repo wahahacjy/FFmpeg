@@ -646,14 +646,25 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     //changed by cjy
 	if(print && s->current_picture_ptr->f->pict_type == AV_PICTURE_TYPE_I && n < 4)
 	{
-		fprintf(cjy_out, "Quantized DCT coeff\n");
+		/*fprintf(cjy_out, "Quantized DCT coeff\n");
 		for(int ci = 0; ci < 64; ci++)
 		{
 			fprintf(cjy_out, "%5d", cjy_block[ci]);
 			if(ci % 8 == 7)
 				fprintf(cjy_out, ";\n");
 		}
-		fprintf(cjy_out, "\n");
+		fprintf(cjy_out, "\n");*/
+
+		fprintf(cjy_out, "Dequantized DCT coeffs\n");
+		for(int j = 0; j < 64; j++)
+		{
+			if(j != 0 && j % 8 == 0)
+				fprintf(cjy_out, ";\n");
+			fprintf(cjy_out, "%5d", block[j]);
+
+		}
+		fprintf(cjy_out, ";\n");
+
 	}
 
     return 0;

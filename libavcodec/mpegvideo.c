@@ -193,6 +193,18 @@ static void dct_unquantize_mpeg2_intra_c(MpegEncContext *s, int16_t *block,
 			block[j] = level;
 		}
 	}
+	if(print && !only_mb_type)
+	{
+		fprintf(cjy_out, "Dequantized DCT coeffs\n");
+		for(int j = 0; j < 64; j++)
+		{
+			if(j != 0 && j % 8 == 0)
+				fprintf(cjy_out, ";\n");
+			fprintf(cjy_out, "%5d", block[j]);
+
+		}
+		fprintf(cjy_out, ";\n");
+	}
 }
 
 static void dct_unquantize_mpeg2_intra_bitexact(MpegEncContext *s,
@@ -2953,7 +2965,7 @@ int ff_mpv_lowest_referenced_row(MpegEncContext *s, int dir) {
 static inline void put_dct(MpegEncContext *s, int16_t *block, int i,
 		uint8_t *dest, int line_size, int qscale) {
 	//changed by cjy
-	if (print && !only_mb_type && i < 4) {
+	if (print && !only_mb_type && i < 4 && !is_markov) {
 		fprintf(cjy_out, "Block %d\n", i);
 		fprintf(cjy_out, "Quantized DCT coeffs\n");
 		for (int j = 0; j < 64; j++) {

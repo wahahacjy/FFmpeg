@@ -70,10 +70,13 @@ def check_mb_diff_split(root, video, folder1, folder2, qs, frames):
             input2.close();
 
 
+
 root = "/home/cjy/Desktop/MBStatistic+mv4/";
 video = "foreman";
 qs = "2";
 frames = 100;
+type_weight = 2;
+mv_weight = 0.1;
 if(len(sys.argv) > 2):
     num1 = int(sys.argv[1]);
     num2 = int(sys.argv[2]);
