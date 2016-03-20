@@ -178,7 +178,7 @@ def calDiffErrorSplit(root):
             if(times == 4):
                 continue;
             filename2 = parent[:-5] + str(times) + parent[-4:] + "/" + filenames[i];
-            result_filename = p_parent + str(times - 1) + "-split";
+            result_filename = p_parent + str(times - 1) + "-split-nomean";
             #print result_filename;
             print "1" + filename1;
             print "2" + filename2;
@@ -258,11 +258,11 @@ def calDiffErrorSplit(root):
                 output = open(result_filename, "a");
                 output.write('0' if len(frame_t_list) == 0 else str(round(np.max(frame_t_list), 3)));
                 output.write(" " + str(len(frame_t_list) / 64));
-                output.write(" " + ('0' if len(frame_t_list) == 0 else str(round(np.mean(frame_t_list), 3))));
+                #output.write(" " + ('0' if len(frame_t_list) == 0 else str(round(np.mean(frame_t_list), 3))));
                 output.write(" " + ('0' if len(frame_t_list) == 0 else str(round(np.var(frame_t_list), 3))));
                 output.write(" " + ('0' if len(frame_r_list) == 0 else str(round(np.max(frame_r_list), 3))));
                 output.write(" " + str(len(frame_r_list) / 64));
-                output.write(" " + ('0' if len(frame_r_list) == 0 else str(round(np.mean(frame_r_list), 3))));
+                #output.write(" " + ('0' if len(frame_r_list) == 0 else str(round(np.mean(frame_r_list), 3))));
                 output.write(" " + ('0' if len(frame_r_list) == 0 else str(round(np.var(frame_r_list), 3))));
                 output.write("\n");
                 output.close();

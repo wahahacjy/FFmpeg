@@ -7,15 +7,15 @@ import sys;
 def generate(root):
     for parent, dirnames, filenames in os.walk(root):
         for i in range(0, len(filenames)):
-            if(filenames[i] == "1-split"):
+            if(filenames[i] == "1-split-nomean"):
                 is_single = True;
-            elif(filenames[i] == "2-split"):
+            elif(filenames[i] == "2-split-nomean"):
                 is_single = False;
             else:
                 continue;
             print parent + "/" + filenames[i];
             qs = parent[parent.rfind("_q") + 2:];
-            out_name = root + "xvid-error-f100-q" + qs + "-svm";
+            out_name = root + "mp2-error-f100-q" + qs + "-svm-nomean";
             print out_name;
             file1 = open(parent + "/" + filenames[i], "r");
             output = open(out_name, "a");
@@ -26,7 +26,7 @@ def generate(root):
                     output.write("+1");
                 else:
                     output.write("-1");
-                for j in range(1, 9):
+                for j in range(1, len(features) + 1):
                     output.write(" " + str(j) + ":" + features[j - 1]);
 
                 output.write("\n");
@@ -51,8 +51,8 @@ def generateCombine(data, root):
             for q in range(1, 16):
                 err_list1 = list();
                 err_list2 = list();
-                err_file_name_1 = root + "/" + video + "_q" + str(q) + "/1-split"; 
-                err_file_name_2 = root + "/" + video + "_q" + str(q) + "/2-split"; 
+                err_file_name_1 = root + "/" + video + "_q" + str(q) + "/1-split-nomean"; 
+                err_file_name_2 = root + "/" + video + "_q" + str(q) + "/2-split-nomean"; 
                 err_file1 = open(err_file_name_1, "r");
                 err_file2 = open(err_file_name_2, "r");
                 for err_line in err_file1:
@@ -66,7 +66,7 @@ def generateCombine(data, root):
         elif("frame" in line):
             qs = int(line.split()[0][1:]);
             if(qs <= 15):
-                result_name = root + "/combine-q" + str(qs) + "-f100-svm";
+                result_name = root + "/combine-q" + str(qs) + "-f100-svm-nomean";
                 output = open(result_name, "a");
                 features = data_file.readline()[1:-2].split();
                 print video + " " + str(qs) + " ",;
@@ -75,7 +75,7 @@ def generateCombine(data, root):
                 for k in range(1, feature_nums + 1):
                     output.write(str(k) + ":" + features[k - 1].strip(",") + " ");
                 single = single_list[times].split();
-                for k in range(feature_nums + 1, feature_nums + 9):
+                for k in range(feature_nums + 1, feature_nums + len(single) + 1):
                     output.write(str(k) + ":" + single[k - feature_nums -1] + " ");
                 output.write("\n");
 
@@ -83,7 +83,7 @@ def generateCombine(data, root):
                 for k in range(1, feature_nums + 1):
                     output.write(str(k) + ":" + features[k].strip(",") + " ");
                 double = double_list[times].split();
-                for k in range(feature_nums + 1, feature_nums + 9):
+                for k in range(feature_nums + 1, feature_nums + len(double) + 1):
                     output.write(str(k) + ":" + double[k - feature_nums - 1] + " ");
                 output.write("\n");
 
@@ -111,5 +111,5 @@ else:
 
 data = "/media/cjy/mi/MBStatistic-xvid-gop10/data.txt"; 
 generateCombine(data, root);
-#generate(root);
+generate(root);
  
